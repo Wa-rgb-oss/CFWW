@@ -1,28 +1,67 @@
 # CFWW
 
-New CleanFreaks Window Washing website.
+New codebase for the CleanFreaks Window Washing website.
 
-## Supabase connection
+## Current migration status
 
-This repository is connected to the Supabase project in the **CFWW** organization.
+The public-facing Wix data has been migrated into Supabase and the site frontend has been rebuilt as a responsive static web app.
 
-- Supabase project ref: `jsrvcmsnsbuuhtwtqvoq`
-- Region: `us-east-1`
-- Client helper: `supabase-client.js`
-- Database schema: currently empty and ready for the new site
+### Migrated from Wix
 
-The client helper uses Supabase's publishable key, which is intended for browser/client use. Never commit a Supabase secret key or service-role key to this repository.
+- 9 active booking services
+- 6 public window-care pricing plans
+- 11 visible Wix Store products
+- Service and product media references
+- Public business contact information
 
-### CLI linking
+The new website reads this content directly from Supabase. Quote requests and contact messages now write directly into Supabase rather than Wix Forms.
 
-If this repository is cloned to a development computer, link the Supabase CLI with:
+### Not migrated automatically
+
+- Wix member accounts
+- historical bookings
+- orders/payment history
+- Wix checkout/payment processing
+- Wix-specific editor layout internals
+
+Those can be handled separately if needed. Customer/private historical data was intentionally not copied as part of the public-site migration.
+
+## Files
+
+- `index.html` — main website
+- `styles.css` — responsive visual system
+- `app.js` — Supabase data loading and forms
+- `supabase-client.js` — safe browser client using the publishable key
+- `.env.example` — connection reference for development
+
+## Supabase
+
+Organization: **CFWW**
+
+Project ref: `jsrvcmsnsbuuhtwtqvoq`
+
+Current public tables:
+
+- `services`
+- `membership_plans`
+- `products`
+- `site_settings`
+
+Form tables:
+
+- `quote_requests`
+- `contact_messages`
+
+All public Data API tables have Row Level Security enabled. Public catalog tables are read-only for visitors. Form tables allow inserts but do not allow visitors to read submissions.
+
+## Local development
+
+Because the frontend uses browser ES modules, serve the repository through a local web server rather than opening `index.html` directly.
+
+For Supabase CLI workflows:
 
 ```bash
 supabase link --project-ref jsrvcmsnsbuuhtwtqvoq
 ```
 
-The CLI may request the database password locally. Do not commit that password.
-
-## Security
-
-Any tables exposed through Supabase's Data API should have Row Level Security enabled and policies written for the site's actual access model.
+Never commit a Supabase secret key or service-role key.
