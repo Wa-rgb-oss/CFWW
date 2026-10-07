@@ -1428,3 +1428,42 @@ button { cursor: pointer; }
   .legacy-feature-image { min-height: 260px; }
   .legacy-about-logo-frame { min-height: 250px; }
 }
+
+
+/* Mobile hero cleanup */
+@media (max-width: 900px) {
+  /* Remove the extra hero copy/chips from the older desktop hero too,
+     so cached markup still renders cleanly on phones. */
+  .legacy-hero-support,
+  .legacy-hero-proof,
+  .mobile-proof-row {
+    display: none !important;
+  }
+
+  .mobile-hero-copy {
+    padding-bottom: 26px;
+  }
+
+  .mobile-hero-actions {
+    margin-top: 22px;
+  }
+
+  /* Tighten the handoff from hero to Services. */
+  .services-section {
+    padding-top: 42px !important;
+  }
+
+  .services-section .legacy-title-block {
+    margin-bottom: 26px;
+  }
+}
+
+@media (max-width: 430px) {
+  .services-section {
+    padding-top: 34px !important;
+  }
+
+  .mobile-hero-copy {
+    padding-bottom: 23px;
+  }
+}
