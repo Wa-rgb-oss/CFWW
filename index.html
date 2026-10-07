@@ -3,232 +3,217 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CleanFreaks Window Washing | Marietta, GA</title>
-  <meta name="description" content="CleanFreaks Window Washing provides residential and business cleaning services in Marietta and surrounding North Atlanta communities.">
-  <meta name="theme-color" content="#071a2b">
-  <link rel="preconnect" href="https://static.wixstatic.com">
-  <link rel="stylesheet" href="./styles.css">
+  <title>CleanFreaks Window Washers LP | Window Cleaner</title>
+  <meta name="description" content="CleanFreaks Window Washing provides residential and commercial window cleaning, vehicle cleaning, pressure washing, and maintenance services in the Marietta area.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="#top" aria-label="CleanFreaks home">
-      <span class="brand-mark" aria-hidden="true">
+  <header class="legacy-header" id="top">
+    <div class="legacy-header-inner">
+      <a class="legacy-logo" href="/" aria-label="CleanFreaks home">
+        <img src="https://static.wixstatic.com/media/945c9b_e255348d542345ed9414812d95127d42~mv2.png" alt="CleanFreaks">
+      </a>
+
+      <button class="legacy-menu-button" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav">
         <span></span><span></span><span></span>
-      </span>
-      <span class="brand-copy">
-        <strong>CleanFreaks</strong>
-        <small>Window Washing</small>
-      </span>
-    </a>
+        <span class="sr-only">Open navigation</span>
+      </button>
 
-    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav">
-      <span></span><span></span><span></span>
-      <span class="sr-only">Toggle navigation</span>
-    </button>
+      <nav class="legacy-nav" id="siteNav">
+        <a href="/" class="active">Home</a>
 
-    <nav class="site-nav" id="siteNav">
-      <a href="#services">Services</a>
-      <a href="#plans">Care Plans</a>
-      <a href="#shop">Shop</a>
-      <a href="#quote">Get a Quote</a>
-      <a href="#contact">Contact</a>
-    </nav>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-button">Services <span>⌄</span></button>
+          <div class="nav-dropdown-menu">
+            <a href="/subscriptions/">Subscriptions</a>
+            <a href="/get-a-quote/">Get Free Quote</a>
+          </div>
+        </div>
+
+        <a href="/operating-hours/">Operating Hours</a>
+        <a href="/information/">Articles</a>
+
+        <div class="nav-dropdown nav-dropdown-more">
+          <button type="button" class="nav-dropdown-button">More <span>⌄</span></button>
+          <div class="nav-dropdown-menu nav-dropdown-menu-right">
+            <a href="https://wadejclaussen.wixsite.com/cleanfreaks/service-agreement">Service Agreement</a>
+            <a href="https://wadejclaussen.wixsite.com/cleanfreaks/terms-of-service">Terms Of Service</a>
+            <a href="https://wadejclaussen.wixsite.com/cleanfreaks/privacy-refund-policy">Privacy/Refund Policy</a>
+            <a href="https://wadejclaussen.wixsite.com/cleanfreaks/employee-login">Employee Login</a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="legacy-header-actions">
+        <a class="legacy-outline-button" href="/get-a-quote/">Get Free Quote</a>
+        <a class="legacy-dark-button" href="/subscriptions/">Subscriptions</a>
+        <a class="legacy-text-link" href="#shop">CART</a>
+        <span class="legacy-text-link legacy-login">Log In</span>
+      </div>
+    </div>
   </header>
 
-  <main id="top">
-    <section class="hero">
-      <div class="hero-text">
-        <p class="eyebrow">Marietta, Georgia</p>
-        <h1>Clean windows.<br>Less hassle.</h1>
-        <p class="hero-copy">
-          Residential and business cleaning services from CleanFreaks Window Washing.
-          Choose a service, request a quote, and keep everything in one place.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#quote">Get a Free Quote</a>
-          <a class="button button-secondary" href="#services">View Services</a>
-        </div>
-        <div class="hero-contact">
-          <a href="tel:+15632094627">(563) 209-4627</a>
-          <span aria-hidden="true">•</span>
-          <a href="mailto:wadejclaussen@gmail.com">wadejclaussen@gmail.com</a>
-        </div>
-      </div>
-
-      <div class="hero-art" aria-hidden="true">
-        <div class="glass-card glass-card-one"></div>
-        <div class="glass-card glass-card-two"></div>
-        <div class="squeegee-line"></div>
-        <div class="spark spark-one">✦</div>
-        <div class="spark spark-two">✦</div>
-        <div class="spark spark-three">✦</div>
-      </div>
-    </section>
-
-    <section class="trust-strip" aria-label="Service highlights">
-      <div><strong>Residential</strong><span>Window and home services</span></div>
-      <div><strong>Business</strong><span>On-site assessment and custom quotes</span></div>
-      <div><strong>Recurring Care</strong><span>Monthly and alternating-month plans</span></div>
-    </section>
-
-    <section class="section section-light" id="services">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">What we clean</p>
-          <h2>Services</h2>
-        </div>
-        <p>These services are loaded directly from the CleanFreaks database, so updates can be made without rebuilding the page.</p>
-      </div>
-      <div class="card-grid service-grid" id="servicesGrid" aria-live="polite">
-        <div class="loading-card">Loading services…</div>
-      </div>
-    </section>
-
-    <section class="section section-dark" id="plans">
-      <div class="section-heading section-heading-inverse">
-        <div>
-          <p class="eyebrow">Keep it clean</p>
-          <h2>Window Care Plans</h2>
-        </div>
-        <p>Recurring options migrated from the original CleanFreaks Wix site.</p>
-      </div>
-      <div class="plan-grid" id="plansGrid" aria-live="polite">
-        <div class="loading-card loading-card-dark">Loading plans…</div>
-      </div>
-    </section>
-
-    <section class="section section-light" id="shop">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CleanFreaks gear</p>
-          <h2>Shop</h2>
-        </div>
-        <p>The existing Wix product catalog has been migrated. Online checkout is intentionally separate so it can be replaced with a payment system you control.</p>
-      </div>
-      <div class="shop-note">
-        <strong>Catalog migrated.</strong>
-        <span>Product data is now owned by the CFWW database. Checkout can be connected next without changing the storefront.</span>
-      </div>
-      <div class="card-grid product-grid" id="productsGrid" aria-live="polite">
-        <div class="loading-card">Loading products…</div>
-      </div>
-    </section>
-
-    <section class="quote-section" id="quote">
-      <div class="quote-copy">
-        <p class="eyebrow">Start here</p>
-        <h2>Request a Quote</h2>
+  <main>
+    <section class="legacy-hero">
+      <img class="legacy-hero-image" src="https://static.wixstatic.com/media/11062b_4d43a8a891aa47d9907380cbf7e406d7~mv2.jpeg" alt="Window Cleaners">
+      <div class="legacy-hero-card">
+        <h1>WELCOME</h1>
         <p>
-          Tell us what you need cleaned. Your request goes directly into the new CleanFreaks database,
-          ready for follow-up without relying on Wix Forms.
+          At CleanFreaks Window Washing LP, we take pride in providing the highest quality window cleaning services.
+          Our experienced team of washers will make your windows sparkle like never before! Get ready to experience a
+          new level of clean. CleanFreaks Window Washing offers top-of-the-line window washing services for residential
+          and commercial properties. Our team of experienced window washers are dedicated to making sure that your windows
+          sparkle like new.
         </p>
-        <div class="quote-points">
-          <span>01 <b>Choose a service</b></span>
-          <span>02 <b>Share your property details</b></span>
-          <span>03 <b>We follow up with pricing</b></span>
+        <img class="legacy-outline-logo" src="https://static.wixstatic.com/media/945c9b_fef7a1ff38d445778f0cbf9ae2993135~mv2.png" alt="Clean Freaks">
+        <div class="legacy-hero-buttons">
+          <a class="legacy-dark-button large" href="/subscriptions/">Subscription Plans</a>
+          <a class="legacy-outline-button large" href="/get-a-quote/">Get Free Quote</a>
         </div>
       </div>
-
-      <form class="form-panel" id="quoteForm">
-        <div class="form-row">
-          <label>
-            Name
-            <input name="name" autocomplete="name" required maxlength="120">
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" autocomplete="email" required maxlength="320">
-          </label>
-        </div>
-        <div class="form-row">
-          <label>
-            Phone
-            <input name="phone" type="tel" autocomplete="tel">
-          </label>
-          <label>
-            Service
-            <select name="service_id" id="serviceSelect">
-              <option value="">Select a service</option>
-            </select>
-          </label>
-        </div>
-        <label>
-          Service address
-          <input name="address" autocomplete="street-address">
-        </label>
-        <div class="form-row form-row-three">
-          <label>
-            City
-            <input name="city" autocomplete="address-level2">
-          </label>
-          <label>
-            State
-            <input name="state" autocomplete="address-level1" value="GA" maxlength="2">
-          </label>
-          <label>
-            ZIP
-            <input name="postal_code" inputmode="numeric" autocomplete="postal-code">
-          </label>
-        </div>
-        <label>
-          Approx. property square footage
-          <input name="property_sqft" type="number" min="1" inputmode="numeric">
-        </label>
-        <label>
-          Tell us what you need
-          <textarea name="message" rows="5" maxlength="5000" placeholder="Windows, access notes, timing, special requests, or anything else we should know."></textarea>
-        </label>
-        <button class="button button-primary button-full" type="submit">Send Quote Request</button>
-        <p class="form-status" id="quoteStatus" role="status"></p>
-      </form>
     </section>
 
-    <section class="section contact-section" id="contact">
-      <div class="contact-card">
-        <p class="eyebrow">Contact</p>
-        <h2>CleanFreaks Window Washing</h2>
-        <p>Marietta and surrounding North Atlanta communities.</p>
-        <div class="contact-links">
-          <a href="tel:+15632094627">(563) 209-4627</a>
-          <a href="mailto:wadejclaussen@gmail.com">wadejclaussen@gmail.com</a>
-        </div>
+    <section class="legacy-section services-section" id="services">
+      <div class="legacy-title-block">
+        <h2>Services</h2>
+        <p>
+          CleanFreaks Window Washers LP provides our clients with a wide range of available options to maintain your
+          home and vehicles. Here is a brief description of some of our services:
+        </p>
       </div>
 
-      <form class="contact-form" id="contactForm">
-        <label>
-          Name
-          <input name="name" autocomplete="name" required maxlength="120">
-        </label>
-        <label>
-          Email
-          <input name="email" type="email" autocomplete="email" required maxlength="320">
-        </label>
-        <label>
-          Phone
-          <input name="phone" type="tel" autocomplete="tel">
-        </label>
-        <label>
-          Subject
-          <input name="subject" maxlength="200">
-        </label>
-        <label>
-          Message
-          <textarea name="message" rows="5" required maxlength="5000"></textarea>
-        </label>
-        <button class="button button-dark button-full" type="submit">Send Message</button>
-        <p class="form-status" id="contactStatus" role="status"></p>
-      </form>
+      <div class="legacy-service-grid">
+        <article class="legacy-service-card">
+          <img src="https://static.wixstatic.com/media/945c9b_17a799f40ff34815935d003e2848d762~mv2.jpg" alt="Window cleaning service">
+          <h3>Window Services</h3>
+          <p>
+            Window services typically involve cleaning and maintaining windows to ensure they are clear, streak-free,
+            and visually appealing. This may include both interior and exterior window cleaning using specialized equipment
+            such as squeegees, cleaning solutions, and extension poles. Window services can also encompass the removal of
+            dirt, debris, and hard water stains from glass surfaces, frames, and tracks.
+          </p>
+        </article>
+
+        <article class="legacy-service-card">
+          <img src="https://static.wixstatic.com/media/945c9b_650d0cb31556422492df957e598f28d3~mv2.jpg" alt="Vehicle cleaning service">
+          <h3>Vehicle Services</h3>
+          <p>
+            Vehicle cleaning services encompass deep cleaning and restoration of both the interior and exterior surfaces of
+            a vehicle. This includes cleaning and polishing the exterior paint, as well as treating tires and wheels. Inside,
+            upholstery, carpets, and dashboard are cleaned and conditioned. Detailing aims to enhance your vehicle's appearance
+            and protect its surfaces for long-term durability.
+          </p>
+        </article>
+
+        <article class="legacy-service-card">
+          <img src="https://static.wixstatic.com/media/bccb7dec5d8846a4800d10a140a02d84.jpg" alt="Pressure washer on stairs">
+          <h3>Pressure Washing Services</h3>
+          <p>
+            Pressure washing services focus on revitalizing outdoor surfaces and maintaining the cleanliness of your property.
+            This involves driveways, sidewalks, decks, and siding using high-pressure water to remove dirt, grime, and mildew.
+            Pressure washing helps preserve the longevity of surfaces by eliminating buildup that can cause damage over time.
+            The goal is to keep your outdoor areas looking fresh and well-maintained, while protecting your property from
+            unnecessary wear.
+          </p>
+        </article>
+      </div>
+
+      <div class="center-action">
+        <a class="legacy-dark-button large" href="/get-a-quote/">Get Free Quote</a>
+      </div>
+    </section>
+
+    <section class="legacy-feature-section">
+      <div class="legacy-feature-image">
+        <img src="https://static.wixstatic.com/media/945c9b_a8a5edbbd4b74ee1821055e0cb64d99d~mv2.jpg" alt="Clean vehicle">
+      </div>
+      <div class="legacy-feature-copy">
+        <h2>Explore the Luxury of Vehicle Cleaning</h2>
+        <p>
+          Give your vehicle the shine it deserves with CleanFreaks Vehicle Cleaning! Our expert team delivers top-tier
+          detailing, from deep interior cleans to sparkling exteriors, ensuring your car, truck, or boat looks as good as new.
+          Whether it’s a routine wash or a full-service detail, we bring professional-grade care to every job. A clean ride isn’t
+          just about appearance, it’s about pride. Book your service today and hit the road in style!
+        </p>
+        <a class="legacy-outline-button large" href="#services">Learn More</a>
+      </div>
+    </section>
+
+    <section class="legacy-commercial-section">
+      <div class="legacy-commercial-heading">
+        <p class="legacy-kicker">Commercial Services</p>
+        <h2>Commercial Window Maintenance</h2>
+      </div>
+      <div class="legacy-commercial-card">
+        <img src="https://static.wixstatic.com/media/11062b_2ca3f04731f84206ac348485e70780c7~mv2.jpg" alt="Commercial Building">
+        <div class="legacy-commercial-info">
+          <h3>Commercial Window Maintenance</h3>
+          <a href="/get-a-quote/" class="legacy-read-more">Read More</a>
+          <div class="legacy-service-detail">
+            <span>30 min</span>
+            <span>Consultation Needed</span>
+          </div>
+          <a class="legacy-dark-button large" href="/get-a-quote/">Get Free Quote</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="legacy-about-section">
+      <div class="legacy-about-copy">
+        <h2>ABOUT US</h2>
+        <p>
+          At CleanFreaks, we pride ourselves on being a one of the best window cleaning service in town. We are a team of
+          professional window washers, each with our own expertise in the window washing field. We have partnered with some
+          of the most prestigious country clubs in the area to ensure that their windows are always sparkling.
+        </p>
+        <p>
+          Our services are designed to be flexible and accommodating, no matter the size of the job. We strive to make sure
+          that our customers are always satisfied with the work that we do. Give CleanFreaks Window Washing LP a call today
+          and experience the difference!
+        </p>
+      </div>
+      <div class="legacy-about-logo">
+        <img src="https://static.wixstatic.com/media/945c9b_fdd881dd696f476896e434c5bef9a80b~mv2.png" alt="CleanFreaks">
+      </div>
+    </section>
+
+    <section class="legacy-section legacy-shop-section" id="shop">
+      <div class="legacy-title-block">
+        <h2>Explore the Collection</h2>
+        <p>Welcome to the Home of CleanFreaks: The Official Window Washer T-Shirt Collection!</p>
+      </div>
+      <div class="legacy-product-grid" id="productsGrid" aria-live="polite">
+        <div class="legacy-loading">Loading products…</div>
+      </div>
+      <p class="legacy-consent">
+        By continuing past this page you agree to the terms and conditions, privacy policy, and refund policy.
+      </p>
+      <div class="center-action">
+        <a class="legacy-dark-button large" href="#shop">Shop Now</a>
+      </div>
+    </section>
+
+    <section class="legacy-careers-section">
+      <img src="https://static.wixstatic.com/media/945c9b_fdd881dd696f476896e434c5bef9a80b~mv2.png" alt="CleanFreaks">
+      <div>
+        <h2>Explore Career Opportunities</h2>
+        <p>Have a skill? Want to help CleanFreaks grow and prosper?</p>
+        <a class="legacy-outline-button inverse large" href="mailto:wadejclaussen@gmail.com?subject=CleanFreaks%20Career%20Opportunity">Apply Now</a>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div>
-      <strong>CleanFreaks</strong>
-      <span>Window Washing</span>
+  <footer class="legacy-footer">
+    <div class="legacy-footer-social">
+      <a href="#" aria-label="Instagram">Instagram</a>
+      <a href="#" aria-label="Facebook">Facebook</a>
     </div>
-    <p>© <span id="year"></span> CleanFreaks Window Washing. All rights reserved.</p>
+    <p>CleanFreaks Marietta</p>
+    <p>©2023 by CleanFreaks Window Washing LP. All Rights Reserved. Making Customers Happy Since 2023.</p>
+    <img src="https://static.wixstatic.com/media/945c9b_df7b9add41b242238f7122c8b35823bc~mv2.png" alt="CleanFreaks Logo">
   </footer>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>
