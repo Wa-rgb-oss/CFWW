@@ -1,0 +1,12 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+
+# Dependencies / build output
+node_modules/
+dist/
