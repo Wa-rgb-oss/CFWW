@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CleanFreaks Window Washing | Marietta, GA</title>
+  <meta name="description" content="CleanFreaks Window Washing provides residential and business cleaning services in Marietta and surrounding North Atlanta communities.">
+  <meta name="theme-color" content="#071a2b">
+  <link rel="preconnect" href="https://static.wixstatic.com">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="CleanFreaks home">
+      <span class="brand-mark" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+      <span class="brand-copy">
+        <strong>CleanFreaks</strong>
+        <small>Window Washing</small>
+      </span>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav">
+      <span></span><span></span><span></span>
+      <span class="sr-only">Toggle navigation</span>
+    </button>
+
+    <nav class="site-nav" id="siteNav">
+      <a href="#services">Services</a>
+      <a href="#plans">Care Plans</a>
+      <a href="#shop">Shop</a>
+      <a href="#quote">Get a Quote</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">Marietta, Georgia</p>
+        <h1>Clean windows.<br>Less hassle.</h1>
+        <p class="hero-copy">
+          Residential and business cleaning services from CleanFreaks Window Washing.
+          Choose a service, request a quote, and keep everything in one place.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#quote">Get a Free Quote</a>
+          <a class="button button-secondary" href="#services">View Services</a>
+        </div>
+        <div class="hero-contact">
+          <a href="tel:+15632094627">(563) 209-4627</a>
+          <span aria-hidden="true">•</span>
+          <a href="mailto:wadejclaussen@gmail.com">wadejclaussen@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="glass-card glass-card-one"></div>
+        <div class="glass-card glass-card-two"></div>
+        <div class="squeegee-line"></div>
+        <div class="spark spark-one">✦</div>
+        <div class="spark spark-two">✦</div>
+        <div class="spark spark-three">✦</div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Service highlights">
+      <div><strong>Residential</strong><span>Window and home services</span></div>
+      <div><strong>Business</strong><span>On-site assessment and custom quotes</span></div>
+      <div><strong>Recurring Care</strong><span>Monthly and alternating-month plans</span></div>
+    </section>
+
+    <section class="section section-light" id="services">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">What we clean</p>
+          <h2>Services</h2>
+        </div>
+        <p>These services are loaded directly from the CleanFreaks database, so updates can be made without rebuilding the page.</p>
+      </div>
+      <div class="card-grid service-grid" id="servicesGrid" aria-live="polite">
+        <div class="loading-card">Loading services…</div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="plans">
+      <div class="section-heading section-heading-inverse">
+        <div>
+          <p class="eyebrow">Keep it clean</p>
+          <h2>Window Care Plans</h2>
+        </div>
+        <p>Recurring options migrated from the original CleanFreaks Wix site.</p>
+      </div>
+      <div class="plan-grid" id="plansGrid" aria-live="polite">
+        <div class="loading-card loading-card-dark">Loading plans…</div>
+      </div>
+    </section>
+
+    <section class="section section-light" id="shop">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CleanFreaks gear</p>
+          <h2>Shop</h2>
+        </div>
+        <p>The existing Wix product catalog has been migrated. Online checkout is intentionally separate so it can be replaced with a payment system you control.</p>
+      </div>
+      <div class="shop-note">
+        <strong>Catalog migrated.</strong>
+        <span>Product data is now owned by the CFWW database. Checkout can be connected next without changing the storefront.</span>
+      </div>
+      <div class="card-grid product-grid" id="productsGrid" aria-live="polite">
+        <div class="loading-card">Loading products…</div>
+      </div>
+    </section>
+
+    <section class="quote-section" id="quote">
+      <div class="quote-copy">
+        <p class="eyebrow">Start here</p>
+        <h2>Request a Quote</h2>
+        <p>
+          Tell us what you need cleaned. Your request goes directly into the new CleanFreaks database,
+          ready for follow-up without relying on Wix Forms.
+        </p>
+        <div class="quote-points">
+          <span>01 <b>Choose a service</b></span>
+          <span>02 <b>Share your property details</b></span>
+          <span>03 <b>We follow up with pricing</b></span>
+        </div>
+      </div>
+
+      <form class="form-panel" id="quoteForm">
+        <div class="form-row">
+          <label>
+            Name
+            <input name="name" autocomplete="name" required maxlength="120">
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required maxlength="320">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            Phone
+            <input name="phone" type="tel" autocomplete="tel">
+          </label>
+          <label>
+            Service
+            <select name="service_id" id="serviceSelect">
+              <option value="">Select a service</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Service address
+          <input name="address" autocomplete="street-address">
+        </label>
+        <div class="form-row form-row-three">
+          <label>
+            City
+            <input name="city" autocomplete="address-level2">
+          </label>
+          <label>
+            State
+            <input name="state" autocomplete="address-level1" value="GA" maxlength="2">
+          </label>
+          <label>
+            ZIP
+            <input name="postal_code" inputmode="numeric" autocomplete="postal-code">
+          </label>
+        </div>
+        <label>
+          Approx. property square footage
+          <input name="property_sqft" type="number" min="1" inputmode="numeric">
+        </label>
+        <label>
+          Tell us what you need
+          <textarea name="message" rows="5" maxlength="5000" placeholder="Windows, access notes, timing, special requests, or anything else we should know."></textarea>
+        </label>
+        <button class="button button-primary button-full" type="submit">Send Quote Request</button>
+        <p class="form-status" id="quoteStatus" role="status"></p>
+      </form>
+    </section>
+
+    <section class="section contact-section" id="contact">
+      <div class="contact-card">
+        <p class="eyebrow">Contact</p>
+        <h2>CleanFreaks Window Washing</h2>
+        <p>Marietta and surrounding North Atlanta communities.</p>
+        <div class="contact-links">
+          <a href="tel:+15632094627">(563) 209-4627</a>
+          <a href="mailto:wadejclaussen@gmail.com">wadejclaussen@gmail.com</a>
+        </div>
+      </div>
+
+      <form class="contact-form" id="contactForm">
+        <label>
+          Name
+          <input name="name" autocomplete="name" required maxlength="120">
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required maxlength="320">
+        </label>
+        <label>
+          Phone
+          <input name="phone" type="tel" autocomplete="tel">
+        </label>
+        <label>
+          Subject
+          <input name="subject" maxlength="200">
+        </label>
+        <label>
+          Message
+          <textarea name="message" rows="5" required maxlength="5000"></textarea>
+        </label>
+        <button class="button button-dark button-full" type="submit">Send Message</button>
+        <p class="form-status" id="contactStatus" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>CleanFreaks</strong>
+      <span>Window Washing</span>
+    </div>
+    <p>© <span id="year"></span> CleanFreaks Window Washing. All rights reserved.</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
