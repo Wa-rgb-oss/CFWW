@@ -2,19 +2,26 @@ import { supabase } from "/supabase-client.js";
 
 const navToggle = document.querySelector("#navToggle");
 const siteNav = document.querySelector("#siteNav");
+const mobileNav = document.querySelector("#mobileNav");
 const productsGrid = document.querySelector("#productsGrid");
 const quoteForm = document.querySelector("#quoteForm");
 const quoteStatus = document.querySelector("#quoteStatus");
 const serviceSelect = document.querySelector("#serviceSelect");
 
 navToggle?.addEventListener("click", () => {
-  const isOpen = siteNav?.classList.toggle("open");
+  const isOpen = mobileNav?.classList.toggle("open");
   navToggle.setAttribute("aria-expanded", String(Boolean(isOpen)));
 });
 
 siteNav?.querySelectorAll("a").forEach((link) => {
   link.addEventListener("click", () => {
-    siteNav.classList.remove("open");
+    navToggle?.setAttribute("aria-expanded", "false");
+  });
+});
+
+mobileNav?.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    mobileNav.classList.remove("open");
     navToggle?.setAttribute("aria-expanded", "false");
   });
 });
