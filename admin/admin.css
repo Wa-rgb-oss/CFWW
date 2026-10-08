@@ -797,3 +797,32 @@ body.admin-body {
     display: none;
   }
 }
+
+
+/* iOS/mobile modal viewport fix */
+@media (max-width: 900px) {
+  .proposal-editor-panel,
+  .job-editor-panel {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0;
+  }
+
+  .proposal-form {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .proposal-editor-actions {
+    z-index: 10;
+    bottom: 0;
+    margin: 0 -14px;
+    padding:
+      14px
+      14px
+      calc(14px + env(safe-area-inset-bottom));
+  }
+}
