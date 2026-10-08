@@ -1,4 +1,4 @@
-import { supabase } from "/supabase-client.js";
+import { supabase, trackSitePageView } from "/supabase-client.js";
 
 const menuButton = document.querySelector("#menuButton");
 const mobileMenu = document.querySelector("#mobileMenu");
@@ -112,13 +112,16 @@ quoteForm?.addEventListener("submit", async (event) => {
     postal_code: String(form.get("postal_code") || "").trim() || null,
     property_sqft: sqft ? Number(sqft) : null,
     message: String(form.get("message") || "").trim() || null,
-    source: "website",
+    company_website: String(form.get("company_website") || "").trim() || null,
   };
 
-  const { error } = await supabase.from("quote_requests").insert(payload);
+  const { data, error } = await supabase.functions.invoke(
+    "submit-quote-request",
+    { body: payload }
+  );
 
-  if (error) {
-    console.error(error);
+  if (error || !data?.ok) {
+    console.error(error || data);
     quoteStatus.className = "form-status error";
     quoteStatus.textContent = "We couldn't send your request. Please call or email us instead.";
   } else {
@@ -134,3 +137,7 @@ quoteForm?.addEventListener("submit", async (event) => {
 });
 
 await Promise.all([loadMaintenancePlans(), loadServiceOptions()]);
+
+trackSitePageView().catch((error) => {
+  console.warn("Site analytics failed.", error);
+});
