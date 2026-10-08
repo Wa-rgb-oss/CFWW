@@ -43,6 +43,7 @@
           <button class="active" type="button" data-view="dashboard">Dashboard</button>
           <button type="button" data-view="requests">Quote Requests</button>
           <button type="button" data-view="proposals">Proposals</button>
+          <button type="button" data-view="jobs">Jobs</button>
           <button type="button" data-view="clients">Clients</button>
         </nav>
         <div class="admin-sidebar-footer">
@@ -64,7 +65,7 @@
           <div class="admin-stats">
             <article><span>New requests</span><strong id="statRequests">0</strong></article>
             <article><span>Open proposals</span><strong id="statProposals">0</strong></article>
-            <article><span>Accepted</span><strong id="statAccepted">0</strong></article>
+            <article><span>Jobs</span><strong id="statJobs">0</strong></article>
             <article><span>Clients</span><strong id="statClients">0</strong></article>
           </div>
 
@@ -95,10 +96,19 @@
           </div>
         </section>
 
+        <section class="admin-view" id="view-jobs" data-view-panel="jobs">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div><h2>Jobs</h2><p>Accepted proposals move here for scheduling and completion.</p></div>
+            </div>
+            <div id="jobsList" class="admin-list"></div>
+          </div>
+        </section>
+
         <section class="admin-view" id="view-clients" data-view-panel="clients">
           <div class="admin-panel">
             <div class="admin-panel-heading">
-              <div><h2>Clients</h2><p>Client contact records created from proposals.</p></div>
+              <div><h2>Clients</h2><p>Client records created from quote requests and proposals.</p></div>
             </div>
             <div id="clientsList" class="admin-list"></div>
           </div>
@@ -123,7 +133,14 @@
           <input type="hidden" id="proposalClientId">
 
           <section class="editor-section">
-            <h3>Client</h3>
+            <div class="editor-section-heading">
+              <h3>Client</h3>
+              <label class="client-picker-label">Existing client
+                <select id="proposalExistingClient">
+                  <option value="">New client / enter manually</option>
+                </select>
+              </label>
+            </div>
             <div class="admin-form-grid">
               <label>Client name
                 <input id="proposalClientName" required maxlength="160">
@@ -201,6 +218,67 @@
           </footer>
 
           <p class="form-status" id="proposalStatus" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="job-editor" id="jobEditor" hidden>
+      <div class="job-editor-backdrop" data-close-job-editor></div>
+      <div class="job-editor-panel">
+        <header class="proposal-editor-header">
+          <div>
+            <p class="eyebrow">Job scheduling</p>
+            <h2 id="jobEditorTitle">Schedule Job</h2>
+          </div>
+          <button class="proposal-close" type="button" data-close-job-editor aria-label="Close job scheduling">×</button>
+        </header>
+
+        <form id="jobForm" class="proposal-form">
+          <input type="hidden" id="jobId">
+
+          <section class="editor-section">
+            <h3>Client & Job</h3>
+            <div class="job-summary">
+              <strong id="jobClientName"></strong>
+              <span id="jobClientEmail"></span>
+              <span id="jobAddress"></span>
+              <span id="jobServiceTitle"></span>
+            </div>
+          </section>
+
+          <section class="editor-section">
+            <h3>Schedule</h3>
+            <div class="admin-form-grid">
+              <label>Date
+                <input id="jobDate" type="date" required>
+              </label>
+              <label>Status
+                <select id="jobStatus">
+                  <option value="scheduling">Scheduling</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </label>
+              <label>Start time
+                <input id="jobStartTime" type="time" required>
+              </label>
+              <label>End time
+                <input id="jobEndTime" type="time">
+              </label>
+            </div>
+            <label>Scheduling note
+              <textarea id="jobSchedulingNotes" rows="4" placeholder="Arrival instructions, access notes, or anything the client should know."></textarea>
+            </label>
+          </section>
+
+          <footer class="proposal-editor-actions">
+            <button class="button button-outline" id="saveJobButton" type="button">Save Schedule</button>
+            <button class="button button-accent" id="sendBookingButton" type="button">Send Booking Confirmation</button>
+          </footer>
+
+          <p class="form-status" id="jobStatusMessage" role="status"></p>
         </form>
       </div>
     </section>
