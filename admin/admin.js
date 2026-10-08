@@ -26,6 +26,7 @@ let proposals = [];
 let clients = [];
 let jobs = [];
 let proposalValueAdjustments = [];
+let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0 };
 let selectedProposalValueYear = new Date().getFullYear();
 let editingProposal = null;
 let editingRequest = null;
@@ -240,7 +241,7 @@ function setView(view) {
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult, analyticsResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -262,6 +263,10 @@ async function refreshAll() {
       .from("proposal_value_adjustments")
       .select("*")
       .order("year", { ascending: false }),
+    supabase
+      .from("site_analytics_summary")
+      .select("*")
+      .single(),
   ]);
 
   requests = requestResult.data || [];
@@ -269,8 +274,15 @@ async function refreshAll() {
   clients = clientResult.data || [];
   jobs = jobResult.data || [];
   proposalValueAdjustments = adjustmentResult.data || [];
+  analyticsSummary = analyticsResult.data || {
+    page_views: 0,
+    sessions: 0,
+    page_views_30d: 0,
+    sessions_30d: 0,
+  };
 
   renderStats();
+  renderTrafficSummary();
   renderProposalValueDashboard();
   renderRequests();
   renderProposals();
@@ -290,6 +302,24 @@ function renderStats() {
     ).length;
   document.querySelector("#statJobs").textContent = jobs.length;
   document.querySelector("#statClients").textContent = clients.length;
+}
+
+function renderTrafficSummary() {
+  const number = new Intl.NumberFormat("en-US");
+
+  document.querySelector("#siteSessions").textContent =
+    number.format(Number(analyticsSummary.sessions || 0));
+
+  document.querySelector("#sitePageViews").textContent =
+    number.format(Number(analyticsSummary.page_views || 0));
+
+  document.querySelector("#siteSessions30d").textContent =
+    number.format(Number(analyticsSummary.sessions_30d || 0)) +
+    " in the last 30 days";
+
+  document.querySelector("#sitePageViews30d").textContent =
+    number.format(Number(analyticsSummary.page_views_30d || 0)) +
+    " in the last 30 days";
 }
 
 function proposalValueYear(proposal) {
