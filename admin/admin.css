@@ -431,3 +431,146 @@ body.admin-body {
     flex-direction: column;
   }
 }
+
+
+/* Proposal value dashboard, response tracking, and destructive actions */
+.admin-view > .admin-panel + .admin-panel {
+  margin-top: 20px;
+}
+
+.proposal-value-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proposal-value-controls select {
+  min-width: 92px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5d9;
+  border-radius: 9px;
+  background: #fff;
+  color: #163746;
+  font-weight: 800;
+}
+
+.proposal-value-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.proposal-value-card {
+  padding: 22px;
+  border-radius: 15px;
+  border: 1px solid rgba(11,28,37,.08);
+}
+
+.proposal-value-card.accepted {
+  background: #edf7f2;
+}
+
+.proposal-value-card.declined {
+  background: #faf0f1;
+}
+
+.proposal-value-card > span {
+  display: block;
+  color: #71818a;
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.proposal-value-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #0b1c25;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -.05em;
+}
+
+.proposal-value-card.accepted strong {
+  color: #1d6c48;
+}
+
+.proposal-value-card.declined strong {
+  color: #8b3838;
+}
+
+.proposal-value-card small {
+  display: block;
+  margin-top: 5px;
+  color: #71818a;
+  line-height: 1.45;
+}
+
+.proposal-value-editor {
+  margin-top: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 13px;
+  border: 1px solid #e0d9eb;
+  border-radius: 14px;
+  background: #f8f6fb;
+}
+
+.proposal-value-editor > p:first-child {
+  margin: 0;
+  color: #71818a;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.proposal-value-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.response-tracked {
+  color: #24704f;
+  font-weight: 750;
+}
+
+.response-pending {
+  color: #94681b;
+  font-weight: 750;
+}
+
+.status-badge.contacted {
+  background: #fff1d8;
+  color: #8b621b;
+}
+
+.status-badge.quoted {
+  background: #f1ecf8;
+  color: #654f92;
+}
+
+.admin-row-actions .danger-action {
+  border-color: #e5c5c8;
+  color: #973e49;
+  background: #fffafa;
+}
+
+.admin-row-actions .danger-action:hover {
+  background: #f8e8ea;
+}
+
+@media (max-width: 700px) {
+  .proposal-value-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .proposal-value-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .proposal-value-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
