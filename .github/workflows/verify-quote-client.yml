@@ -1,0 +1,16 @@
+name: Verify Quote Client Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/verify-quote-client.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call quote sync verification endpoint
+        run: |
+          set -e
+          curl --fail-with-body -sS             "https://jsrvcmsnsbuuhtwtqvoq.supabase.co/functions/v1/verify-quote-client-sync?key=cfww-quote-sync-check-2026-10-08"
