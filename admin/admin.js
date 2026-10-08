@@ -287,9 +287,29 @@ function renderProposals() {
     });
   });
   document.querySelectorAll("[data-email-proposal]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const proposal = proposals.find((item) => item.id === button.dataset.emailProposal);
-      if (proposal) openEmail(proposal);
+      if (!proposal) return;
+
+      let ready = proposal;
+      if (proposal.status === "draft") {
+        const { data, error } = await supabase
+          .from("proposals")
+          .update({ status: "sent", sent_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq("id", proposal.id)
+          .select("*")
+          .single();
+
+        if (error) {
+          alert("Could not mark this proposal as sent.");
+          return;
+        }
+
+        ready = data;
+        await refreshAll();
+      }
+
+      openEmail(ready);
     });
   });
 }
