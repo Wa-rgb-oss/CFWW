@@ -863,3 +863,35 @@ body.admin-body {
   .career-editor { grid-template-columns: 1fr; }
   .career-editor-panel { height: 100dvh; max-height: 100dvh; padding: 20px 14px calc(110px + env(safe-area-inset-bottom)); }
 }
+
+
+/* Client search */
+.client-search {
+  width: min(340px, 100%);
+}
+
+.client-search input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5d9;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b1c25;
+  font: inherit;
+  font-size: 12px;
+}
+
+.client-search input:focus {
+  outline: 2px solid rgba(91, 71, 142, .18);
+  border-color: #6b58a0;
+}
+
+@media (max-width: 700px) {
+  .client-search {
+    width: 100%;
+  }
+
+  #view-clients .admin-panel-heading {
+    align-items: stretch;
+  }
+}
