@@ -23,6 +23,9 @@ const existingClientSelect = document.querySelector("#proposalExistingClient");
 const careerEditor = document.querySelector("#careerEditor");
 const careerForm = document.querySelector("#careerForm");
 const careerStatus = document.querySelector("#careerStatus");
+const applicantReplyEditor = document.querySelector("#applicantReplyEditor");
+const applicantReplyForm = document.querySelector("#applicantReplyForm");
+const applicantReplyStatus = document.querySelector("#applicantReplyStatus");
 
 let ownerEmail = "";
 let requests = [];
@@ -30,6 +33,7 @@ let proposals = [];
 let clients = [];
 let jobs = [];
 let careers = [];
+let careerApplications = [];
 let proposalValueAdjustments = [];
 let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0, page_views_month: 0, sessions_month: 0 };
 let analyticsMonthly = [];
@@ -248,7 +252,7 @@ function setView(view) {
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult, careerResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, careerResult, applicationResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -272,6 +276,10 @@ async function refreshAll() {
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false }),
     supabase
+      .from("career_applications")
+      .select("*")
+      .order("submitted_at", { ascending: false }),
+    supabase
       .from("proposal_value_adjustments")
       .select("*")
       .order("year", { ascending: false }),
@@ -290,6 +298,7 @@ async function refreshAll() {
   clients = clientResult.data || [];
   jobs = jobResult.data || [];
   careers = careerResult.data || [];
+  careerApplications = applicationResult.data || [];
   proposalValueAdjustments = adjustmentResult.data || [];
   analyticsSummary = analyticsResult.data || {
     page_views: 0,
@@ -310,6 +319,7 @@ async function refreshAll() {
   renderJobs();
   renderClients();
   renderCareers();
+  renderCareerApplications();
   populateExistingClientSelect();
 }
 
@@ -1148,6 +1158,248 @@ function renderCareers() {
     });
   });
 }
+
+
+function careerApplicationStatusLabel(status) {
+  const labels = {
+    new: "New",
+    reviewing: "Reviewing",
+    contacted: "Contacted",
+    interview: "Interview",
+    offer: "Offer",
+    hired: "Hired",
+    rejected: "Rejected",
+  };
+
+  return labels[status] || status;
+}
+
+function renderCareerApplications() {
+  const list = document.querySelector("#careerApplicantsList");
+  if (!list) return;
+
+  const search = String(document.querySelector("#careerApplicantSearch")?.value || "")
+    .trim()
+    .toLowerCase();
+
+  const filter = document.querySelector("#careerApplicantFilter")?.value || "";
+
+  const filtered = careerApplications.filter((application) => {
+    const matchesStatus = !filter || application.status === filter;
+
+    const haystack = [
+      application.name,
+      application.email,
+      application.phone,
+      application.position_title,
+      application.availability,
+      application.experience,
+      application.message,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return matchesStatus && (!search || haystack.includes(search));
+  });
+
+  list.innerHTML = filtered.length
+    ? filtered.map((application) => `
+      <article class="applicant-card">
+        <div class="applicant-card-top">
+          <div class="applicant-identity">
+            <strong>${escapeHtml(application.name)}</strong>
+            <span>${escapeHtml(application.position_title)}</span>
+          </div>
+
+          <div class="applicant-meta">
+            <span>${dateTimeLabel(application.submitted_at)}</span>
+            <select data-applicant-status="${application.id}" aria-label="Applicant status">
+              ${["new","reviewing","contacted","interview","offer","hired","rejected"].map((status) =>
+                '<option value="' + status + '"' +
+                (application.status === status ? " selected" : "") +
+                ">" + careerApplicationStatusLabel(status) + "</option>"
+              ).join("")}
+            </select>
+          </div>
+        </div>
+
+        <div class="applicant-contact">
+          <a href="mailto:${escapeHtml(application.email)}">${escapeHtml(application.email)}</a>
+          ${application.phone ? '<a href="tel:' + escapeHtml(application.phone) + '">' + escapeHtml(application.phone) + '</a>' : ""}
+          ${application.replied_at ? '<span>Last replied ' + escapeHtml(dateTimeLabel(application.replied_at)) + '</span>' : '<span class="response-pending">Not replied yet</span>'}
+        </div>
+
+        <details class="applicant-details">
+          <summary>View application</summary>
+
+          ${application.availability ? `
+            <div class="applicant-detail-block">
+              <h4>Availability</h4>
+              <p>${escapeHtml(application.availability)}</p>
+            </div>
+          ` : ""}
+
+          ${application.experience ? `
+            <div class="applicant-detail-block">
+              <h4>Relevant experience</h4>
+              <p>${escapeHtml(application.experience).replaceAll("\n","<br>")}</p>
+            </div>
+          ` : ""}
+
+          ${application.message ? `
+            <div class="applicant-detail-block">
+              <h4>Applicant note</h4>
+              <p>${escapeHtml(application.message).replaceAll("\n","<br>")}</p>
+            </div>
+          ` : ""}
+        </details>
+
+        <div class="admin-row-actions applicant-actions">
+          <button type="button" data-reply-applicant="${application.id}">Reply</button>
+          <a class="admin-action-link" href="mailto:${escapeHtml(application.email)}">Open Email</a>
+        </div>
+      </article>
+    `).join("")
+    : '<div class="empty-state">No applicants match the current filter.</div>';
+
+  document.querySelectorAll("[data-applicant-status]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const { error } = await supabase
+        .from("career_applications")
+        .update({
+          status: select.value,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", select.dataset.applicantStatus);
+
+      if (error) {
+        console.error(error);
+        alert("Could not update the applicant status.");
+        await refreshAll();
+        return;
+      }
+
+      const application = careerApplications.find(
+        (item) => item.id === select.dataset.applicantStatus
+      );
+
+      if (application) application.status = select.value;
+    });
+  });
+
+  document.querySelectorAll("[data-reply-applicant]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openApplicantReply(button.dataset.replyApplicant);
+    });
+  });
+}
+
+document.querySelector("#careerApplicantSearch")?.addEventListener(
+  "input",
+  renderCareerApplications
+);
+
+document.querySelector("#careerApplicantFilter")?.addEventListener(
+  "change",
+  renderCareerApplications
+);
+
+function openApplicantReply(id) {
+  const application = careerApplications.find((item) => item.id === id);
+  if (!application || !applicantReplyEditor) return;
+
+  document.querySelector("#applicantReplyId").value = application.id;
+  document.querySelector("#applicantReplyName").textContent = application.name || "";
+  document.querySelector("#applicantReplyEmail").textContent = application.email || "";
+  document.querySelector("#applicantReplyPosition").textContent =
+    application.position_title || "";
+  document.querySelector("#applicantReplySubject").value =
+    "CleanFreaks Application - " + (application.position_title || "Career Application");
+  document.querySelector("#applicantReplyMessage").value = "";
+
+  applicantReplyStatus.className = "form-status";
+  applicantReplyStatus.textContent = "";
+  applicantReplyEditor.hidden = false;
+}
+
+function closeApplicantReply() {
+  if (!applicantReplyEditor) return;
+
+  applicantReplyEditor.hidden = true;
+  applicantReplyForm?.reset();
+  applicantReplyStatus.className = "form-status";
+  applicantReplyStatus.textContent = "";
+}
+
+document.querySelectorAll("[data-close-applicant-reply]").forEach((element) => {
+  element.addEventListener("click", closeApplicantReply);
+});
+
+applicantReplyForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const button = applicantReplyForm.querySelector('button[type="submit"]');
+  const applicationId = document.querySelector("#applicantReplyId").value;
+  const subject = document.querySelector("#applicantReplySubject").value.trim();
+  const message = document.querySelector("#applicantReplyMessage").value.trim();
+
+  button.disabled = true;
+  button.textContent = "Sending...";
+  applicantReplyStatus.className = "form-status";
+  applicantReplyStatus.textContent = "";
+
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      "send-career-reply",
+      {
+        body: {
+          application_id: applicationId,
+          subject,
+          message,
+        },
+      }
+    );
+
+    if (error || !data?.ok) {
+      let detail =
+        data?.message ||
+        error?.message ||
+        "The reply could not be sent.";
+
+      try {
+        if (error?.context instanceof Response) {
+          const payload = await error.context.clone().json();
+          detail =
+            payload?.provider_response?.message ||
+            payload?.message ||
+            payload?.error ||
+            detail;
+        }
+      } catch {
+        // Keep original detail.
+      }
+
+      throw new Error(detail);
+    }
+
+    applicantReplyStatus.className = "form-status success";
+    applicantReplyStatus.textContent = "Reply sent.";
+    button.textContent = "Sent";
+
+    await refreshAll();
+
+    window.setTimeout(() => closeApplicantReply(), 700);
+  } catch (error) {
+    console.error(error);
+    applicantReplyStatus.className = "form-status error";
+    applicantReplyStatus.textContent =
+      error.message || "The reply could not be sent.";
+    button.textContent = "Send Reply";
+    button.disabled = false;
+  }
+});
+
 
 function resetCareerEditor() {
   careerForm.reset();
