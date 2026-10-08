@@ -716,13 +716,8 @@ const { data: sessionData } = await supabase.auth.getSession();
 if (sessionData.session) await showAdmin(sessionData.session);
 else showLogin();
 
-supabase.auth.onAuthStateChange((_event, session) => {
-  if (!session) return;
-
-  window.setTimeout(() => {
-    showAdmin(session).catch((error) => {
-      console.error(error);
-      showLogin("Signed in, but the admin dashboard could not load. Please refresh and try again.");
-    });
-  }, 0);
+supabase.auth.onAuthStateChange((event) => {
+  if (event === "SIGNED_OUT") {
+    showLogin();
+  }
 });
