@@ -83,21 +83,37 @@ async function showAdmin(session) {
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  loginStatus.textContent = "Signing in...";
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: loginEmail.value.trim(),
-    password: loginPassword.value,
-  });
-
-  if (error) {
-    loginStatus.className = "form-status error";
-    loginStatus.textContent = error.message;
-    return;
-  }
-
+  const submitButton = loginForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = "Signing in...";
   loginStatus.className = "form-status";
-  await showAdmin(data.session);
+  loginStatus.textContent = "";
+
+  try {
+    const timeout = new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error("Sign-in took too long. Please try again.")), 15000);
+    });
+
+    const signIn = supabase.auth.signInWithPassword({
+      email: loginEmail.value.trim(),
+      password: loginPassword.value,
+    });
+
+    const { data, error } = await Promise.race([signIn, timeout]);
+
+    if (error) throw error;
+    if (!data?.session) throw new Error("Sign-in completed without a session.");
+
+    await showAdmin(data.session);
+  } catch (error) {
+    console.error(error);
+    loginStatus.className = "form-status error";
+    loginStatus.textContent = error.message || "Could not sign in.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Sign In";
+  }
 });
 
 createLoginButton.addEventListener("click", async () => {
@@ -700,6 +716,13 @@ const { data: sessionData } = await supabase.auth.getSession();
 if (sessionData.session) await showAdmin(sessionData.session);
 else showLogin();
 
-supabase.auth.onAuthStateChange(async (_event, session) => {
-  if (session) await showAdmin(session);
+supabase.auth.onAuthStateChange((_event, session) => {
+  if (!session) return;
+
+  window.setTimeout(() => {
+    showAdmin(session).catch((error) => {
+      console.error(error);
+      showLogin("Signed in, but the admin dashboard could not load. Please refresh and try again.");
+    });
+  }, 0);
 });
