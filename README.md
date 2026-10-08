@@ -1,67 +1,54 @@
 # CFWW
 
-New codebase for the CleanFreaks Window Washing website.
+Production website and operations frontend for CleanFreaks Window Washing.
 
-## Current migration status
+## Purpose
 
-The public-facing Wix data has been migrated into Supabase and the site frontend has been rebuilt as a responsive static web app.
+This repository is the standalone replacement for the previous hosted website. It is served through GitHub Pages and connected directly to the CFWW Supabase project.
 
-### Migrated from Wix
+No payment processing is implemented. The site is built around:
 
-- 9 active booking services
-- 6 public window-care pricing plans
-- 11 visible Wix Store products
-- Service and product media references
-- Public business contact information
+- public service information
+- maintenance plans
+- weekend operating hours
+- quote requests
+- client records
+- proposal creation and tracking
+- client-facing proposal review
 
-The new website reads this content directly from Supabase. Quote requests and contact messages now write directly into Supabase rather than Wix Forms.
+## Public routes
 
-### Not migrated automatically
+- `/`
+- `/get-a-quote/`
+- `/maintenance-plans/`
+- `/operating-hours/`
+- `/proposal/?token=...`
 
-- Wix member accounts
-- historical bookings
-- orders/payment history
-- Wix checkout/payment processing
-- Wix-specific editor layout internals
+## Admin
 
-Those can be handled separately if needed. Customer/private historical data was intentionally not copied as part of the public-site migration.
+- `/admin/`
 
-## Files
-
-- `index.html` — main website
-- `styles.css` — responsive visual system
-- `app.js` — Supabase data loading and forms
-- `supabase-client.js` — safe browser client using the publishable key
-- `.env.example` — connection reference for development
+The admin application uses Supabase Auth and Row Level Security. Access to operational data is restricted to the business-owner email stored in public site settings.
 
 ## Supabase
 
-Organization: **CFWW**
-
 Project ref: `jsrvcmsnsbuuhtwtqvoq`
 
-Current public tables:
+Main tables:
 
 - `services`
-- `membership_plans`
-- `products`
-- `site_settings`
-
-Form tables:
-
+- `maintenance_plans`
 - `quote_requests`
 - `contact_messages`
+- `clients`
+- `proposals`
+- `proposal_items`
+- `site_settings`
 
-All public Data API tables have Row Level Security enabled. Public catalog tables are read-only for visitors. Form tables allow inserts but do not allow visitors to read submissions.
+## Assets
 
-## Local development
+Website images are stored directly in this repository under `/assets/`.
 
-Because the frontend uses browser ES modules, serve the repository through a local web server rather than opening `index.html` directly.
+## Security
 
-For Supabase CLI workflows:
-
-```bash
-supabase link --project-ref jsrvcmsnsbuuhtwtqvoq
-```
-
-Never commit a Supabase secret key or service-role key.
+The browser uses only the Supabase publishable key. Secret and service-role credentials must never be committed to this repository.
