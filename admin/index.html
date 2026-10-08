@@ -226,6 +226,29 @@
             </div>
             <div id="careersList" class="admin-list"></div>
           </div>
+
+          <div class="admin-panel applicants-panel">
+            <div class="admin-panel-heading">
+              <div>
+                <h2>Applicants</h2>
+                <p>Applications submitted through the public Careers page.</p>
+              </div>
+              <div class="applicant-panel-tools">
+                <input id="careerApplicantSearch" type="search" placeholder="Search applicants..." autocomplete="off">
+                <select id="careerApplicantFilter" aria-label="Filter applicants by status">
+                  <option value="">All statuses</option>
+                  <option value="new">New</option>
+                  <option value="reviewing">Reviewing</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="interview">Interview</option>
+                  <option value="offer">Offer</option>
+                  <option value="hired">Hired</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+            <div id="careerApplicantsList" class="career-applicants-list"></div>
+          </div>
         </section>
       </div>
     </section>
@@ -302,6 +325,49 @@
           </footer>
 
           <p class="form-status" id="careerStatus" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+
+    <section class="applicant-reply-editor" id="applicantReplyEditor" hidden>
+      <div class="proposal-editor-backdrop" data-close-applicant-reply></div>
+      <div class="applicant-reply-panel">
+        <header class="proposal-editor-header">
+          <div>
+            <p class="eyebrow">Applicant reply</p>
+            <h2 id="applicantReplyTitle">Reply to Applicant</h2>
+          </div>
+          <button class="proposal-close" type="button" data-close-applicant-reply aria-label="Close applicant reply">×</button>
+        </header>
+
+        <form id="applicantReplyForm" class="proposal-form">
+          <input type="hidden" id="applicantReplyId">
+
+          <section class="editor-section">
+            <h3>Applicant</h3>
+            <div class="applicant-reply-summary">
+              <strong id="applicantReplyName"></strong>
+              <span id="applicantReplyEmail"></span>
+              <span id="applicantReplyPosition"></span>
+            </div>
+          </section>
+
+          <section class="editor-section">
+            <h3>Message</h3>
+            <label>Subject
+              <input id="applicantReplySubject" maxlength="300" required>
+            </label>
+            <label>Reply
+              <textarea id="applicantReplyMessage" rows="10" maxlength="8000" required placeholder="Write your response to the applicant."></textarea>
+            </label>
+          </section>
+
+          <footer class="proposal-editor-actions">
+            <button class="button button-accent" type="submit">Send Reply</button>
+          </footer>
+
+          <p class="form-status" id="applicantReplyStatus" role="status"></p>
         </form>
       </div>
     </section>
