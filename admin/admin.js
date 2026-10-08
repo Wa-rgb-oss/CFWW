@@ -20,11 +20,16 @@ const jobForm = document.querySelector("#jobForm");
 const jobStatusMessage = document.querySelector("#jobStatusMessage");
 const existingClientSelect = document.querySelector("#proposalExistingClient");
 
+const careerEditor = document.querySelector("#careerEditor");
+const careerForm = document.querySelector("#careerForm");
+const careerStatus = document.querySelector("#careerStatus");
+
 let ownerEmail = "";
 let requests = [];
 let proposals = [];
 let clients = [];
 let jobs = [];
+let careers = [];
 let proposalValueAdjustments = [];
 let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0, page_views_month: 0, sessions_month: 0 };
 let analyticsMonthly = [];
@@ -237,12 +242,13 @@ function setView(view) {
     proposals: "Proposals",
     jobs: "Jobs",
     clients: "Clients",
+    careers: "Careers",
   };
   document.querySelector("#viewTitle").textContent = titles[view] || "CleanFreaks";
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, careerResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -259,6 +265,11 @@ async function refreshAll() {
       .from("jobs")
       .select("*")
       .order("scheduled_date", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("career_openings")
+      .select("*")
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false }),
     supabase
       .from("proposal_value_adjustments")
@@ -278,6 +289,7 @@ async function refreshAll() {
   proposals = proposalResult.data || [];
   clients = clientResult.data || [];
   jobs = jobResult.data || [];
+  careers = careerResult.data || [];
   proposalValueAdjustments = adjustmentResult.data || [];
   analyticsSummary = analyticsResult.data || {
     page_views: 0,
@@ -297,6 +309,7 @@ async function refreshAll() {
   renderProposals();
   renderJobs();
   renderClients();
+  renderCareers();
   populateExistingClientSelect();
 }
 
@@ -1053,6 +1066,204 @@ function renderClients() {
     });
   });
 }
+
+
+function renderCareers() {
+  const list = document.querySelector("#careersList");
+  if (!list) return;
+
+  list.innerHTML = careers.length
+    ? careers.map((career) => `
+      <article class="admin-row">
+        <div class="admin-row-main">
+          <strong>${escapeHtml(career.title)}</strong>
+          <span>${escapeHtml(career.employment_type)} · ${escapeHtml(career.location)}</span>
+        </div>
+        <div class="admin-row-meta">
+          <span>${escapeHtml(career.pay_range || "Pay not listed")}</span>
+          <span>Order ${Number(career.sort_order || 0)}</span>
+          <span class="status-badge ${career.is_active ? "accepted" : "void"}">
+            ${career.is_active ? "Published" : "Hidden"}
+          </span>
+        </div>
+        <div class="admin-row-actions">
+          <button type="button" data-edit-career="${career.id}">Edit</button>
+          <button type="button" data-toggle-career="${career.id}">
+            ${career.is_active ? "Unpublish" : "Publish"}
+          </button>
+        </div>
+      </article>
+    `).join("")
+    : '<div class="empty-state">No career openings yet. Use New Opening to add one.</div>';
+
+  document.querySelectorAll("[data-edit-career]").forEach((button) => {
+    button.addEventListener("click", () => openCareerEditor(button.dataset.editCareer));
+  });
+
+  document.querySelectorAll("[data-toggle-career]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const career = careers.find((item) => item.id === button.dataset.toggleCareer);
+      if (!career) return;
+
+      const { error } = await supabase
+        .from("career_openings")
+        .update({
+          is_active: !career.is_active,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", career.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not update the career opening.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+}
+
+function resetCareerEditor() {
+  careerForm.reset();
+  document.querySelector("#careerId").value = "";
+  document.querySelector("#careerEmploymentType").value = "Part-time";
+  document.querySelector("#careerLocation").value = "Marietta, GA";
+  document.querySelector("#careerApplicationEmail").value = "info@cleanfreaksmarietta.com";
+  document.querySelector("#careerSortOrder").value = "0";
+  document.querySelector("#careerIsActive").checked = true;
+  document.querySelector("#careerEditorTitle").textContent = "New Opening";
+  document.querySelector("#deleteCareerButton").hidden = true;
+  careerStatus.className = "form-status";
+  careerStatus.textContent = "";
+}
+
+function openCareerEditor(id = null) {
+  resetCareerEditor();
+
+  if (id) {
+    const career = careers.find((item) => item.id === id);
+    if (!career) return;
+
+    document.querySelector("#careerId").value = career.id;
+    document.querySelector("#careerTitle").value = career.title || "";
+    document.querySelector("#careerEmploymentType").value = career.employment_type || "Part-time";
+    document.querySelector("#careerLocation").value = career.location || "Marietta, GA";
+    document.querySelector("#careerPayRange").value = career.pay_range || "";
+    document.querySelector("#careerSummary").value = career.summary || "";
+    document.querySelector("#careerDescription").value = career.description || "";
+    document.querySelector("#careerRequirements").value = career.requirements || "";
+    document.querySelector("#careerApplicationEmail").value =
+      career.application_email || "info@cleanfreaksmarietta.com";
+    document.querySelector("#careerSortOrder").value = String(career.sort_order || 0);
+    document.querySelector("#careerIsActive").checked = Boolean(career.is_active);
+    document.querySelector("#careerEditorTitle").textContent = "Edit Opening";
+    document.querySelector("#deleteCareerButton").hidden = false;
+  }
+
+  careerEditor.hidden = false;
+}
+
+function closeCareerEditor() {
+  careerEditor.hidden = true;
+  resetCareerEditor();
+}
+
+document.querySelector("#newCareerButton")?.addEventListener("click", () => {
+  openCareerEditor();
+});
+
+document.querySelectorAll("[data-close-career-editor]").forEach((element) => {
+  element.addEventListener("click", closeCareerEditor);
+});
+
+careerForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const submitButton = careerForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving...";
+  careerStatus.className = "form-status";
+  careerStatus.textContent = "";
+
+  const id = document.querySelector("#careerId").value || null;
+  const payload = {
+    title: document.querySelector("#careerTitle").value.trim(),
+    employment_type: document.querySelector("#careerEmploymentType").value,
+    location: document.querySelector("#careerLocation").value.trim() || "Marietta, GA",
+    pay_range: document.querySelector("#careerPayRange").value.trim() || null,
+    summary: document.querySelector("#careerSummary").value.trim() || null,
+    description: document.querySelector("#careerDescription").value.trim() || null,
+    requirements: document.querySelector("#careerRequirements").value.trim() || null,
+    application_email:
+      document.querySelector("#careerApplicationEmail").value.trim() ||
+      "info@cleanfreaksmarietta.com",
+    is_active: document.querySelector("#careerIsActive").checked,
+    sort_order: Number(document.querySelector("#careerSortOrder").value || 0),
+    updated_at: new Date().toISOString(),
+  };
+
+  try {
+    if (!payload.title) throw new Error("Add a job title.");
+
+    if (id) {
+      const { error } = await supabase
+        .from("career_openings")
+        .update(payload)
+        .eq("id", id);
+
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from("career_openings")
+        .insert(payload);
+
+      if (error) throw error;
+    }
+
+    careerStatus.className = "form-status success";
+    careerStatus.textContent = "Opening saved.";
+    await refreshAll();
+
+    window.setTimeout(() => closeCareerEditor(), 500);
+  } catch (error) {
+    console.error(error);
+    careerStatus.className = "form-status error";
+    careerStatus.textContent = error.message || "Could not save the opening.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Save Opening";
+  }
+});
+
+document.querySelector("#deleteCareerButton")?.addEventListener("click", async () => {
+  const id = document.querySelector("#careerId").value;
+  if (!id) return;
+
+  const career = careers.find((item) => item.id === id);
+  if (!career) return;
+
+  const confirmed = window.confirm(
+    "Delete the career opening \"" + career.title + "\"?\n\nThis cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  const { error } = await supabase
+    .from("career_openings")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    careerStatus.className = "form-status error";
+    careerStatus.textContent = "Could not delete the opening.";
+    return;
+  }
+
+  closeCareerEditor();
+  await refreshAll();
+});
 
 function proposalLink(proposal) {
   return window.location.origin + "/proposal/?token=" + proposal.public_token;
