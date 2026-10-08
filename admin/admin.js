@@ -376,10 +376,33 @@ async function sendProposalEmail(proposal) {
   });
 
   if (error) {
-    const detail = error?.context?.body?.message || error?.message || "";
-    if (String(detail).includes("email_provider_not_configured")) {
-      throw new Error("Proposal email is ready, but the outbound email provider still needs to be connected.");
+    let detail = error?.message || "";
+
+    try {
+      if (error?.context instanceof Response) {
+        const payload = await error.context.clone().json();
+
+        if (payload?.error === "email_provider_not_configured") {
+          throw new Error("Proposal email is ready, but the outbound email provider still needs to be connected.");
+        }
+
+        if (payload?.provider_response?.message) {
+          detail = payload.provider_response.message;
+        } else if (payload?.message) {
+          detail = payload.message;
+        } else if (payload?.error) {
+          detail = payload.error;
+        }
+      }
+    } catch (parseError) {
+      if (parseError instanceof Error &&
+          parseError.message !== "Proposal email is ready, but the outbound email provider still needs to be connected.") {
+        console.warn("Could not parse Edge Function error response.", parseError);
+      } else if (parseError instanceof Error) {
+        throw parseError;
+      }
     }
+
     throw new Error(detail || "The proposal email could not be sent.");
   }
 
