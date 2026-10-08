@@ -318,3 +318,14 @@ body.admin-body {
   .line-item-remove { grid-column: 2; justify-self: end; }
   .proposal-editor-actions { display: grid; grid-template-columns: 1fr; }
 }
+
+/* Hidden application states must always win over layout display rules. */
+[hidden] {
+  display: none !important;
+}
+
+.admin-login[hidden],
+.admin-app[hidden],
+.proposal-editor[hidden] {
+  display: none !important;
+}
