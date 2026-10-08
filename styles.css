@@ -795,3 +795,24 @@ textarea { resize: vertical; }
     height: 9px;
   }
 }
+
+
+/* Quote page brand hero */
+.quote-page .page-hero {
+  background: linear-gradient(135deg, #4d3a7d 0%, #39275f 55%, #24183f 100%);
+  color: #ffffff;
+}
+
+.quote-page .page-hero .eyebrow {
+  color: #72d5e8;
+}
+
+.quote-page .page-hero p:not(.eyebrow) {
+  color: #ddd7eb;
+}
+
+@media (max-width: 900px) {
+  .quote-page .page-hero {
+    background: linear-gradient(145deg, #4d3a7d 0%, #34235a 100%);
+  }
+}
