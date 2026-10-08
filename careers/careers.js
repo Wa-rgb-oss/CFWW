@@ -94,6 +94,7 @@ function renderOpening(opening) {
           <textarea name="message" rows="5" maxlength="4000" placeholder="Tell us a little about yourself and why you are interested in working with CleanFreaks."></textarea>
         </label>
 
+        <p class="career-privacy-note">By submitting this application, you acknowledge the <a href="/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
         <button class="button button-accent career-submit" type="submit">Submit Application</button>
         <p class="form-status career-application-status" role="status"></p>
       </form>
