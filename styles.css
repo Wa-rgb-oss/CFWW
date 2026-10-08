@@ -709,3 +709,59 @@ textarea { resize: vertical; }
     gap: 20px;
   }
 }
+
+
+/* CleanFreaks purple brand bands */
+:root {
+  --cf-purple: #4d3a7d;
+  --cf-purple-mid: #39275f;
+  --cf-purple-deep: #24183f;
+  --cf-purple-dark: #171029;
+}
+
+.hero {
+  background: var(--cf-purple-dark);
+}
+
+.hero-overlay {
+  background:
+    linear-gradient(90deg,
+      rgba(23,16,41,.97) 0%,
+      rgba(39,27,66,.84) 40%,
+      rgba(59,43,91,.40) 72%,
+      rgba(35,24,60,.28) 100%
+    ),
+    linear-gradient(0deg, rgba(23,16,41,.46), transparent 55%);
+}
+
+.company-band {
+  background: var(--cf-purple-dark);
+}
+
+.company-copy {
+  background:
+    linear-gradient(145deg, #4a3676 0%, #302052 52%, #1d1435 100%);
+}
+
+.about-mark {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(114,213,232,.22), transparent 34%),
+    linear-gradient(145deg, #493673, #201634);
+}
+
+.quote-banner {
+  background:
+    linear-gradient(120deg, #523e82 0%, #3a285f 48%, #21163b 100%);
+}
+
+@media (max-width: 900px) {
+  .hero-overlay {
+    background:
+      linear-gradient(90deg,
+        rgba(23,16,41,.95),
+        rgba(45,32,73,.73) 68%,
+        rgba(59,43,91,.42)
+      ),
+      linear-gradient(0deg, rgba(23,16,41,.38), transparent 50%);
+  }
+}
