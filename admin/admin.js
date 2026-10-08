@@ -168,8 +168,8 @@ document.querySelector("#sendBookingButton")?.addEventListener("click", async ()
   try {
     const job = await saveJobSchedule();
 
-    if (!job.scheduled_date || !job.start_time) {
-      throw new Error("Select a date and start time before sending the booking confirmation.");
+    if (!job.scheduled_date || !job.start_time || !job.end_time) {
+      throw new Error("Select a date, start time, and end time before sending the booking confirmation.");
     }
 
     button.textContent = "Sending...";
