@@ -423,12 +423,19 @@ function requestRow(request) {
       </div>
       <div class="admin-row-meta">
         <span>${escapeHtml(request.email)}</span>
-        <span>${dateLabel(request.created_at)}</span>
-        <span class="status-badge">${escapeHtml(request.status)}</span>
+        <span>Received ${dateLabel(request.created_at)}</span>
+        <span class="${request.responded_at ? "response-tracked" : "response-pending"}">
+          ${request.responded_at
+            ? "Responded " + escapeHtml(dateTimeLabel(request.responded_at)) + " · " + escapeHtml(responseMethodLabel(request.responded_via))
+            : "Awaiting response"}
+        </span>
+        <span class="status-badge ${escapeHtml(request.status)}">${escapeHtml(request.status)}</span>
       </div>
       <div class="admin-row-actions">
         <button type="button" data-build-request="${request.id}">Build Proposal</button>
         <button type="button" data-contact-request="${request.id}">Contact</button>
+        ${!request.responded_at ? '<button type="button" data-mark-responded="' + request.id + '">Mark Responded</button>' : ""}
+        <button class="danger-action" type="button" data-delete-request="${request.id}">Delete</button>
       </div>
     </article>
   `;
