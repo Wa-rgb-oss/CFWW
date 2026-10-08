@@ -881,3 +881,12 @@ textarea { resize: vertical; }
     font-size: 20px;
   }
 }
+
+
+.quote-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
