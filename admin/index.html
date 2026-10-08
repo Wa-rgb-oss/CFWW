@@ -69,6 +69,52 @@
             <article><span>Clients</span><strong id="statClients">0</strong></article>
           </div>
 
+          <div class="admin-panel proposal-value-panel">
+            <div class="admin-panel-heading">
+              <div>
+                <h2>Proposal Value</h2>
+                <p>Accepted and declined proposal value by year.</p>
+              </div>
+              <div class="proposal-value-controls">
+                <select id="proposalValueYear" aria-label="Proposal value year"></select>
+                <button type="button" class="admin-text-button" id="editProposalValuesButton">Edit totals</button>
+              </div>
+            </div>
+
+            <div class="proposal-value-grid">
+              <article class="proposal-value-card accepted">
+                <span>Accepted</span>
+                <strong id="acceptedProposalValue">$0.00</strong>
+                <small id="acceptedProposalBreakdown">From accepted proposals</small>
+              </article>
+              <article class="proposal-value-card declined">
+                <span>Declined</span>
+                <strong id="declinedProposalValue">$0.00</strong>
+                <small id="declinedProposalBreakdown">From declined proposals</small>
+              </article>
+            </div>
+
+            <form class="proposal-value-editor" id="proposalValueEditor" hidden>
+              <p>Manual adjustments change the dashboard totals without changing proposal history.</p>
+              <div class="admin-form-grid">
+                <label>Accepted adjustment
+                  <input id="acceptedValueAdjustment" type="number" step="0.01" value="0">
+                </label>
+                <label>Declined adjustment
+                  <input id="declinedValueAdjustment" type="number" step="0.01" value="0">
+                </label>
+              </div>
+              <label>Adjustment note
+                <input id="proposalValueAdjustmentNote" maxlength="240" placeholder="Optional reason for the adjustment">
+              </label>
+              <div class="proposal-value-editor-actions">
+                <button type="button" class="button button-outline" id="cancelProposalValuesButton">Cancel</button>
+                <button type="submit" class="button button-accent">Save Adjustments</button>
+              </div>
+              <p class="form-status" id="proposalValueStatus" role="status"></p>
+            </form>
+          </div>
+
           <div class="admin-panel">
             <div class="admin-panel-heading">
               <div><h2>Recent requests</h2><p>Newest quote requests from the public site.</p></div>
