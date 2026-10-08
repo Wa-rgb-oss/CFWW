@@ -1207,3 +1207,27 @@ textarea { resize: vertical; }
     padding: 24px 18px;
   }
 }
+
+
+/* Two-column footer links */
+.footer-links {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  row-gap: 8px;
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 9px;
+  }
+}
+
+@media (max-width: 430px) {
+  .footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+  }
+}
