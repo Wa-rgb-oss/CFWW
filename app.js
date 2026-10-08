@@ -1,108 +1,102 @@
 import { supabase } from "/supabase-client.js";
 
-const navToggle = document.querySelector("#navToggle");
-const siteNav = document.querySelector("#siteNav");
-const mobileNav = document.querySelector("#mobileNav");
-const productsGrid = document.querySelector("#productsGrid");
-const quoteForm = document.querySelector("#quoteForm");
-const quoteStatus = document.querySelector("#quoteStatus");
-const serviceSelect = document.querySelector("#serviceSelect");
+const menuButton = document.querySelector("#menuButton");
+const mobileMenu = document.querySelector("#mobileMenu");
 
-navToggle?.addEventListener("click", () => {
-  const isOpen = mobileNav?.classList.toggle("open");
-  navToggle.setAttribute("aria-expanded", String(Boolean(isOpen)));
+menuButton?.addEventListener("click", () => {
+  const open = mobileMenu?.classList.toggle("open");
+  menuButton.setAttribute("aria-expanded", String(Boolean(open)));
 });
 
-siteNav?.querySelectorAll("a").forEach((link) => {
+mobileMenu?.querySelectorAll("a").forEach((link) => {
   link.addEventListener("click", () => {
-    navToggle?.setAttribute("aria-expanded", "false");
+    mobileMenu.classList.remove("open");
+    menuButton?.setAttribute("aria-expanded", "false");
   });
 });
 
-mobileNav?.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    mobileNav.classList.remove("open");
-    navToggle?.setAttribute("aria-expanded", "false");
-  });
-});
+document.querySelector("#currentYear")?.replaceChildren(String(new Date().getFullYear()));
 
-function formatMoney(value) {
+function money(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: 2,
+    maximumFractionDigits: Number(value) % 1 === 0 ? 0 : 2,
   }).format(Number(value));
 }
 
-async function loadProducts() {
-  if (!productsGrid) return;
+async function loadMaintenancePlans() {
+  const grid = document.querySelector("[data-maintenance-grid]");
+  if (!grid) return;
+
+  const limit = Number(grid.dataset.limit || 20);
 
   const { data, error } = await supabase
-    .from("products")
-    .select("id,name,price,image_url")
-    .eq("visible", true)
-    .order("name");
+    .from("maintenance_plans")
+    .select("id,name,description,total_price,billing_period_count,display_index")
+    .eq("active", true)
+    .eq("visibility", "PUBLIC")
+    .order("display_index")
+    .limit(limit);
 
   if (error) {
-    productsGrid.innerHTML = '<div class="legacy-loading">Products are temporarily unavailable.</div>';
+    console.error(error);
+    grid.innerHTML = '<div class="loading-card">Maintenance plans are temporarily unavailable.</div>';
     return;
   }
 
-  productsGrid.innerHTML = "";
+  grid.innerHTML = "";
 
-  data.forEach((product) => {
-    const article = document.createElement("article");
-    article.className = "legacy-product-card";
+  data.forEach((plan) => {
+    const card = document.createElement("article");
+    card.className = "plan-card";
 
-    const media = document.createElement("div");
-    media.className = "legacy-product-image";
-
-    const image = document.createElement("img");
-    image.loading = "lazy";
-    image.src = product.image_url || "";
-    image.alt = product.name;
-    media.appendChild(image);
+    const priceMatch = (plan.description || "").match(/\$(\d+(?:\.\d+)?)\/mo/i);
+    const price = document.createElement("div");
+    price.className = "plan-price";
+    price.textContent = priceMatch ? "$" + priceMatch[1] + "/mo" : money(plan.total_price || 0);
 
     const title = document.createElement("h3");
-    title.textContent = product.name;
+    title.textContent = plan.name;
 
-    const price = document.createElement("p");
-    price.className = "legacy-product-price";
-    price.textContent = "Price " + formatMoney(product.price);
+    const copy = document.createElement("p");
+    copy.textContent = plan.description || "Recurring window maintenance.";
 
-    article.append(media, title, price);
-    productsGrid.appendChild(article);
+    card.append(price, title, copy);
+    grid.appendChild(card);
   });
 }
 
 async function loadServiceOptions() {
-  if (!serviceSelect) return;
+  const select = document.querySelector("#serviceSelect");
+  if (!select) return;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("services")
     .select("id,name")
     .eq("active", true)
     .order("sort_order");
 
-  if (!data) return;
+  if (error || !data) return;
 
   data.forEach((service) => {
     const option = document.createElement("option");
     option.value = service.id;
     option.textContent = service.name;
-    serviceSelect.appendChild(option);
+    select.appendChild(option);
   });
 }
 
-function setStatus(element, type, message) {
-  if (!element) return;
-  element.className = "form-status " + type;
-  element.textContent = message;
-}
+const quoteForm = document.querySelector("#quoteForm");
+const quoteStatus = document.querySelector("#quoteStatus");
 
 quoteForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  setStatus(quoteStatus, "", "Sending…");
+
+  const submit = quoteForm.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  submit.textContent = "Sending...";
+  quoteStatus.textContent = "";
 
   const form = new FormData(quoteForm);
   const sqft = form.get("property_sqft");
@@ -125,14 +119,18 @@ quoteForm?.addEventListener("submit", async (event) => {
 
   if (error) {
     console.error(error);
-    setStatus(quoteStatus, "error", "We couldn't send your request. Please contact us directly.");
-    return;
+    quoteStatus.className = "form-status error";
+    quoteStatus.textContent = "We couldn't send your request. Please call or email us instead.";
+  } else {
+    quoteForm.reset();
+    const state = quoteForm.querySelector('[name="state"]');
+    if (state) state.value = "GA";
+    quoteStatus.className = "form-status success";
+    quoteStatus.textContent = "Request received. We will follow up with you.";
   }
 
-  quoteForm.reset();
-  const stateField = quoteForm.querySelector('[name="state"]');
-  if (stateField) stateField.value = "GA";
-  setStatus(quoteStatus, "success", "Your quote request has been received.");
+  submit.disabled = false;
+  submit.textContent = "Send Quote Request";
 });
 
-await Promise.all([loadProducts(), loadServiceOptions()]);
+await Promise.all([loadMaintenancePlans(), loadServiceOptions()]);
