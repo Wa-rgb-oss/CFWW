@@ -87,163 +87,6 @@ async function getOwnerEmail() {
 async function verifyOwner(session) {
   if (!session?.user?.email) return false;
   if (!ownerEmail) 
-document.querySelectorAll("[data-close-job-editor]").forEach((element) => {
-  element.addEventListener("click", closeJobEditor);
-});
-
-function openJobEditor(id) {
-  const job = jobs.find((item) => item.id === id);
-  if (!job) return;
-
-  document.querySelector("#jobId").value = job.id;
-  document.querySelector("#jobEditorTitle").textContent =
-    job.status === "scheduling" ? "Schedule Job" : "Edit Job Schedule";
-  document.querySelector("#jobClientName").textContent = job.client_name || "";
-  document.querySelector("#jobClientEmail").textContent = job.client_email || "";
-  document.querySelector("#jobAddress").textContent =
-    [job.service_address, job.city, job.state, job.postal_code]
-      .filter(Boolean)
-      .join(", ");
-  document.querySelector("#jobServiceTitle").textContent = job.title || "Cleaning Job";
-
-  document.querySelector("#jobDate").value = job.scheduled_date || "";
-  document.querySelector("#jobStartTime").value = job.start_time
-    ? String(job.start_time).slice(0, 5)
-    : "";
-  document.querySelector("#jobEndTime").value = job.end_time
-    ? String(job.end_time).slice(0, 5)
-    : "";
-  document.querySelector("#jobStatus").value = job.status || "scheduling";
-  document.querySelector("#jobSchedulingNotes").value = job.scheduling_notes || "";
-
-  jobStatusMessage.textContent = "";
-  jobEditor.hidden = false;
-}
-
-function closeJobEditor() {
-  jobEditor.hidden = true;
-  jobForm.reset();
-  jobStatusMessage.textContent = "";
-}
-
-async function saveJobSchedule() {
-  const jobId = document.querySelector("#jobId").value;
-  if (!jobId) throw new Error("Job not found.");
-
-  const status = document.querySelector("#jobStatus").value;
-  const now = new Date().toISOString();
-
-  const payload = {
-    scheduled_date: document.querySelector("#jobDate").value || null,
-    start_time: document.querySelector("#jobStartTime").value || null,
-    end_time: document.querySelector("#jobEndTime").value || null,
-    scheduling_notes: document.querySelector("#jobSchedulingNotes").value.trim() || null,
-    status,
-    updated_at: now,
-  };
-
-  if (status === "completed") payload.completed_at = now;
-  if (status === "cancelled") payload.cancelled_at = now;
-
-  const { data, error } = await supabase
-    .from("jobs")
-    .update(payload)
-    .eq("id", jobId)
-    .select("*")
-    .single();
-
-  if (error) throw error;
-
-  await refreshAll();
-  return data;
-}
-
-document.querySelector("#saveJobButton")?.addEventListener("click", async () => {
-  const button = document.querySelector("#saveJobButton");
-  button.disabled = true;
-  button.textContent = "Saving...";
-  jobStatusMessage.className = "form-status";
-  jobStatusMessage.textContent = "";
-
-  try {
-    await saveJobSchedule();
-    jobStatusMessage.className = "form-status success";
-    jobStatusMessage.textContent = "Schedule saved.";
-    button.textContent = "Saved";
-    window.setTimeout(() => {
-      button.textContent = "Save Schedule";
-      button.disabled = false;
-    }, 1000);
-  } catch (error) {
-    console.error(error);
-    jobStatusMessage.className = "form-status error";
-    jobStatusMessage.textContent = error.message || "Could not save schedule.";
-    button.textContent = "Save Schedule";
-    button.disabled = false;
-  }
-});
-
-document.querySelector("#sendBookingButton")?.addEventListener("click", async () => {
-  const button = document.querySelector("#sendBookingButton");
-  button.disabled = true;
-  button.textContent = "Saving...";
-
-  try {
-    const job = await saveJobSchedule();
-
-    if (!job.scheduled_date || !job.start_time || !job.end_time) {
-      throw new Error("Select a date, start time, and end time before sending the booking confirmation.");
-    }
-
-    button.textContent = "Sending...";
-
-    const { data, error } = await supabase.functions.invoke(
-      "send-job-confirmation",
-      { body: { job_id: job.id } }
-    );
-
-    if (error) {
-      let message = error.message || "Could not send booking confirmation.";
-
-      try {
-        if (error.context instanceof Response) {
-          const payload = await error.context.clone().json();
-          message =
-            payload?.provider_response?.message ||
-            payload?.message ||
-            payload?.error ||
-            message;
-        }
-      } catch {
-        // Keep original error.
-      }
-
-      throw new Error(message);
-    }
-
-    if (!data?.ok) {
-      throw new Error(data?.message || data?.error || "Could not send booking confirmation.");
-    }
-
-    jobStatusMessage.className = "form-status success";
-    jobStatusMessage.textContent = "Booking confirmation sent.";
-    button.textContent = "Sent";
-
-    await refreshAll();
-
-    window.setTimeout(() => {
-      button.textContent = "Send Booking Confirmation";
-      button.disabled = false;
-    }, 1200);
-  } catch (error) {
-    console.error(error);
-    jobStatusMessage.className = "form-status error";
-    jobStatusMessage.textContent = error.message || "Could not send booking confirmation.";
-    button.textContent = "Send Booking Confirmation";
-    button.disabled = false;
-  }
-});
-
 await getOwnerEmail();
   return session.user.email.toLowerCase() === ownerEmail;
 }
@@ -1069,6 +912,163 @@ document.querySelector("#emailProposalButton").addEventListener("click", async (
     proposalStatus.className = "form-status error";
     proposalStatus.textContent = error.message || "Could not send proposal email.";
     button.textContent = "Save & Email Proposal";
+    button.disabled = false;
+  }
+});
+
+document.querySelectorAll("[data-close-job-editor]").forEach((element) => {
+  element.addEventListener("click", closeJobEditor);
+});
+
+function openJobEditor(id) {
+  const job = jobs.find((item) => item.id === id);
+  if (!job) return;
+
+  document.querySelector("#jobId").value = job.id;
+  document.querySelector("#jobEditorTitle").textContent =
+    job.status === "scheduling" ? "Schedule Job" : "Edit Job Schedule";
+  document.querySelector("#jobClientName").textContent = job.client_name || "";
+  document.querySelector("#jobClientEmail").textContent = job.client_email || "";
+  document.querySelector("#jobAddress").textContent =
+    [job.service_address, job.city, job.state, job.postal_code]
+      .filter(Boolean)
+      .join(", ");
+  document.querySelector("#jobServiceTitle").textContent = job.title || "Cleaning Job";
+
+  document.querySelector("#jobDate").value = job.scheduled_date || "";
+  document.querySelector("#jobStartTime").value = job.start_time
+    ? String(job.start_time).slice(0, 5)
+    : "";
+  document.querySelector("#jobEndTime").value = job.end_time
+    ? String(job.end_time).slice(0, 5)
+    : "";
+  document.querySelector("#jobStatus").value = job.status || "scheduling";
+  document.querySelector("#jobSchedulingNotes").value = job.scheduling_notes || "";
+
+  jobStatusMessage.textContent = "";
+  jobEditor.hidden = false;
+}
+
+function closeJobEditor() {
+  jobEditor.hidden = true;
+  jobForm.reset();
+  jobStatusMessage.textContent = "";
+}
+
+async function saveJobSchedule() {
+  const jobId = document.querySelector("#jobId").value;
+  if (!jobId) throw new Error("Job not found.");
+
+  const status = document.querySelector("#jobStatus").value;
+  const now = new Date().toISOString();
+
+  const payload = {
+    scheduled_date: document.querySelector("#jobDate").value || null,
+    start_time: document.querySelector("#jobStartTime").value || null,
+    end_time: document.querySelector("#jobEndTime").value || null,
+    scheduling_notes: document.querySelector("#jobSchedulingNotes").value.trim() || null,
+    status,
+    updated_at: now,
+  };
+
+  if (status === "completed") payload.completed_at = now;
+  if (status === "cancelled") payload.cancelled_at = now;
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .update(payload)
+    .eq("id", jobId)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+
+  await refreshAll();
+  return data;
+}
+
+document.querySelector("#saveJobButton")?.addEventListener("click", async () => {
+  const button = document.querySelector("#saveJobButton");
+  button.disabled = true;
+  button.textContent = "Saving...";
+  jobStatusMessage.className = "form-status";
+  jobStatusMessage.textContent = "";
+
+  try {
+    await saveJobSchedule();
+    jobStatusMessage.className = "form-status success";
+    jobStatusMessage.textContent = "Schedule saved.";
+    button.textContent = "Saved";
+    window.setTimeout(() => {
+      button.textContent = "Save Schedule";
+      button.disabled = false;
+    }, 1000);
+  } catch (error) {
+    console.error(error);
+    jobStatusMessage.className = "form-status error";
+    jobStatusMessage.textContent = error.message || "Could not save schedule.";
+    button.textContent = "Save Schedule";
+    button.disabled = false;
+  }
+});
+
+document.querySelector("#sendBookingButton")?.addEventListener("click", async () => {
+  const button = document.querySelector("#sendBookingButton");
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try {
+    const job = await saveJobSchedule();
+
+    if (!job.scheduled_date || !job.start_time || !job.end_time) {
+      throw new Error("Select a date, start time, and end time before sending the booking confirmation.");
+    }
+
+    button.textContent = "Sending...";
+
+    const { data, error } = await supabase.functions.invoke(
+      "send-job-confirmation",
+      { body: { job_id: job.id } }
+    );
+
+    if (error) {
+      let message = error.message || "Could not send booking confirmation.";
+
+      try {
+        if (error.context instanceof Response) {
+          const payload = await error.context.clone().json();
+          message =
+            payload?.provider_response?.message ||
+            payload?.message ||
+            payload?.error ||
+            message;
+        }
+      } catch {
+        // Keep original error.
+      }
+
+      throw new Error(message);
+    }
+
+    if (!data?.ok) {
+      throw new Error(data?.message || data?.error || "Could not send booking confirmation.");
+    }
+
+    jobStatusMessage.className = "form-status success";
+    jobStatusMessage.textContent = "Booking confirmation sent.";
+    button.textContent = "Sent";
+
+    await refreshAll();
+
+    window.setTimeout(() => {
+      button.textContent = "Send Booking Confirmation";
+      button.disabled = false;
+    }, 1200);
+  } catch (error) {
+    console.error(error);
+    jobStatusMessage.className = "form-status error";
+    jobStatusMessage.textContent = error.message || "Could not send booking confirmation.";
+    button.textContent = "Send Booking Confirmation";
     button.disabled = false;
   }
 });
