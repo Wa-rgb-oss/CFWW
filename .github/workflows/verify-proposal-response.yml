@@ -1,0 +1,16 @@
+name: Verify Proposal Response
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/verify-proposal-response.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Accept temporary verification proposal
+        run: |
+          set -e
+          curl --fail-with-body -sS             -X POST             "https://jsrvcmsnsbuuhtwtqvoq.supabase.co/functions/v1/respond-to-proposal"             -H "Content-Type: application/json"             --data '{"token":"00000000-0000-4000-8000-000000000789","response":"accepted"}'
