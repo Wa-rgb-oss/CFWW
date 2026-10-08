@@ -895,3 +895,266 @@ body.admin-body {
     align-items: stretch;
   }
 }
+
+
+/* Career applicants */
+.applicants-panel {
+  margin-top: 20px;
+}
+
+.applicant-panel-tools {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.applicant-panel-tools input,
+.applicant-panel-tools select {
+  padding: 9px 12px;
+  border: 1px solid #cbd5d9;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b1c25;
+  font: inherit;
+  font-size: 11px;
+}
+
+.applicant-panel-tools input {
+  width: min(260px, 100%);
+}
+
+.career-applicants-list {
+  display: grid;
+  gap: 12px;
+}
+
+.applicant-card {
+  padding: 18px 20px;
+  border: 1px solid rgba(11,28,37,.09);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.applicant-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.applicant-identity {
+  display: grid;
+  gap: 3px;
+}
+
+.applicant-identity strong {
+  color: #0b1c25;
+  font-size: 16px;
+}
+
+.applicant-identity span {
+  color: #71818a;
+  font-size: 11px;
+}
+
+.applicant-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  color: #71818a;
+  font-size: 10px;
+}
+
+.applicant-meta select {
+  padding: 7px 10px;
+  border: 1px solid #cbd5d9;
+  border-radius: 999px;
+  background: #f8faf9;
+  color: #163746;
+  font: inherit;
+  font-weight: 800;
+}
+
+.applicant-contact {
+  margin-top: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 15px;
+  color: #71818a;
+  font-size: 10px;
+}
+
+.applicant-contact a {
+  color: #1b6176;
+  text-decoration: none;
+}
+
+.applicant-details {
+  margin-top: 15px;
+  border-top: 1px solid rgba(11,28,37,.07);
+  border-bottom: 1px solid rgba(11,28,37,.07);
+}
+
+.applicant-details summary {
+  padding: 12px 0;
+  cursor: pointer;
+  color: #5b478e;
+  font-size: 11px;
+  font-weight: 850;
+  list-style: none;
+}
+
+.applicant-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.applicant-details summary::after {
+  content: "+";
+  float: right;
+  font-size: 16px;
+}
+
+.applicant-details[open] summary::after {
+  content: "−";
+}
+
+.applicant-detail-block {
+  padding: 0 0 14px;
+}
+
+.applicant-detail-block h4 {
+  margin: 0 0 5px;
+  color: #0b1c25;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.applicant-detail-block p {
+  margin: 0;
+  color: #5f6e75;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.applicant-actions {
+  margin-top: 14px;
+}
+
+.admin-action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #ccd6da;
+  border-radius: 999px;
+  background: #fff;
+  color: #163746;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.applicant-reply-editor[hidden] {
+  display: none !important;
+}
+
+.applicant-reply-editor {
+  position: fixed;
+  z-index: 215;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr minmax(520px, 720px);
+}
+
+.applicant-reply-panel {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 28px;
+  background: #f7f9f9;
+  box-shadow: -25px 0 70px rgba(0,0,0,.2);
+}
+
+.applicant-reply-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.applicant-reply-summary strong {
+  color: #0b1c25;
+  font-size: 18px;
+}
+
+.applicant-reply-summary span {
+  color: #71818a;
+  font-size: 11px;
+}
+
+.status-badge.reviewing {
+  background: #eef2f5;
+  color: #536a77;
+}
+
+.status-badge.interview {
+  background: #f1ecf8;
+  color: #654f92;
+}
+
+.status-badge.offer {
+  background: #fff1d8;
+  color: #8b621b;
+}
+
+.status-badge.hired {
+  background: #e3f3eb;
+  color: #1d6c48;
+}
+
+.status-badge.rejected {
+  background: #f6e7e7;
+  color: #8b3838;
+}
+
+@media (max-width: 900px) {
+  .applicant-reply-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .applicant-reply-panel {
+    height: 100dvh;
+    max-height: 100dvh;
+    padding: 20px 14px calc(110px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 700px) {
+  .applicant-panel-tools {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .applicant-panel-tools input,
+  .applicant-panel-tools select {
+    width: 100%;
+  }
+
+  .applicant-card-top {
+    flex-direction: column;
+  }
+
+  .applicant-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .applicant-meta select {
+    flex: 1;
+  }
+}
