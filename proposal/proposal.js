@@ -1,4 +1,4 @@
-import { supabase, createProposalClient } from "/supabase-client.js";
+import { supabase, createProposalClient, trackSitePageView } from "/supabase-client.js";
 
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
@@ -271,3 +271,7 @@ document
   .addEventListener("click", () => window.print());
 
 await loadProposal();
+
+trackSitePageView("/proposal/").catch((error) => {
+  console.warn("Site analytics failed.", error);
+});
