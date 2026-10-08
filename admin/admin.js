@@ -1011,9 +1011,31 @@ existingClientSelect?.addEventListener("change", () => {
 
 function renderClients() {
   const list = document.querySelector("#clientsList");
+  const searchInput = document.querySelector("#clientSearch");
+  const query = String(searchInput?.value || "").trim().toLowerCase();
 
-  list.innerHTML = clients.length
-    ? clients.map((client) => `
+  const filteredClients = query
+    ? clients.filter((client) => {
+        const haystack = [
+          client.name,
+          client.company,
+          client.email,
+          client.phone,
+          client.address,
+          client.city,
+          client.state,
+          client.postal_code,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return haystack.includes(query);
+      })
+    : clients;
+
+  list.innerHTML = filteredClients.length
+    ? filteredClients.map((client) => `
       <article class="admin-row">
         <div class="admin-row-main">
           <strong>${escapeHtml(client.name)}</strong>
@@ -1029,7 +1051,9 @@ function renderClients() {
         </div>
       </article>
     `).join("")
-    : '<div class="empty-state">Clients are created when you save proposals.</div>';
+    : query
+      ? '<div class="empty-state">No clients match your search.</div>'
+      : '<div class="empty-state">Clients are created when you save proposals.</div>';
 
   document.querySelectorAll("[data-email-client]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1067,6 +1091,7 @@ function renderClients() {
   });
 }
 
+document.querySelector("#clientSearch")?.addEventListener("input", renderClients);
 
 function renderCareers() {
   const list = document.querySelector("#careersList");
