@@ -574,3 +574,93 @@ body.admin-body {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* Collapsed proposal archive */
+.archive-panel {
+  margin-top: 20px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.archive-summary {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.archive-summary::-webkit-details-marker {
+  display: none;
+}
+
+.archive-summary::after {
+  content: "＋";
+  margin-left: 8px;
+  color: #71818a;
+  font-size: 21px;
+  line-height: 1;
+}
+
+.archive-panel[open] .archive-summary::after {
+  content: "−";
+}
+
+.archive-summary h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.archive-summary p {
+  margin: 3px 0 0;
+  color: #71818a;
+  font-size: 11px;
+}
+
+.archive-count {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #f1ecf8;
+  color: #654f92;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.archive-panel[open] .archive-summary {
+  border-bottom: 1px solid rgba(11,28,37,.08);
+}
+
+.archive-list {
+  padding: 18px 22px 22px;
+}
+
+.archived-row {
+  background: #f8f8f9;
+  opacity: .92;
+}
+
+.archived-row:hover {
+  opacity: 1;
+}
+
+@media (max-width: 700px) {
+  .archive-summary {
+    padding: 16px;
+  }
+
+  .archive-list {
+    padding: 14px 16px 16px;
+  }
+
+  .archive-summary p {
+    display: none;
+  }
+}
