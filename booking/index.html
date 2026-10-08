@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Booking Confirmed | CleanFreaks</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/booking/booking.css">
+</head>
+<body class="booking-page">
+  <main class="booking-shell">
+    <article class="booking-card">
+      <header class="booking-header">
+        <p class="booking-kicker">CleanFreaks Window Washing</p>
+        <h1 id="bookingTitle">Booking Confirmed</h1>
+        <p id="bookingStatusCopy">Your cleaning appointment is scheduled.</p>
+      </header>
+
+      <div class="booking-body">
+        <section class="booking-intro">
+          <p>Hi <strong id="bookingClient"></strong>,</p>
+          <p>Your CleanFreaks appointment details are below.</p>
+        </section>
+
+        <section class="booking-details">
+          <div>
+            <span>Date</span>
+            <strong id="bookingDate"></strong>
+          </div>
+          <div>
+            <span>Time</span>
+            <strong id="bookingTime"></strong>
+          </div>
+          <div class="wide" id="bookingAddressRow">
+            <span>Service address</span>
+            <strong id="bookingAddress"></strong>
+          </div>
+          <div class="wide">
+            <span>Service</span>
+            <strong id="bookingService"></strong>
+          </div>
+        </section>
+
+        <section class="booking-note" id="bookingNoteSection" hidden>
+          <h2>Scheduling Note</h2>
+          <p id="bookingNote"></p>
+        </section>
+
+        <section class="booking-contact">
+          <h2>Need to make a change?</h2>
+          <p>Reply to your confirmation email or contact CleanFreaks directly.</p>
+          <div class="booking-actions">
+            <a href="tel:+15632094627">(563) 209-4627</a>
+            <a href="mailto:wadejclaussen@gmail.com">Email CleanFreaks</a>
+          </div>
+        </section>
+
+        <p class="booking-error" id="bookingError" role="status"></p>
+
+        <footer class="booking-footer">
+          <strong>CleanFreaks Window Washing</strong>
+          <span>Marietta, Georgia</span>
+        </footer>
+      </div>
+    </article>
+  </main>
+
+  <script type="module" src="/booking/booking.js"></script>
+</body>
+</html>
