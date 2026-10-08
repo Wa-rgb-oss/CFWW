@@ -1337,3 +1337,16 @@ textarea { resize: vertical; }
     width: 100%;
   }
 }
+
+
+.career-privacy-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.career-privacy-note a {
+  color: #5b478e;
+  font-weight: 750;
+}
