@@ -765,3 +765,33 @@ textarea { resize: vertical; }
       linear-gradient(0deg, rgba(23,16,41,.38), transparent 50%);
   }
 }
+
+
+/* Brand divider between Maintenance Plans and About */
+.about-section {
+  position: relative;
+}
+
+.about-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background:
+    linear-gradient(
+      90deg,
+      #24183f 0%,
+      #4d3a7d 34%,
+      #72d5e8 50%,
+      #4d3a7d 66%,
+      #24183f 100%
+    );
+}
+
+@media (max-width: 900px) {
+  .about-section::before {
+    height: 9px;
+  }
+}
