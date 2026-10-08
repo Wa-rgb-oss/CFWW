@@ -15,10 +15,16 @@ const proposalForm = document.querySelector("#proposalForm");
 const lineItems = document.querySelector("#lineItems");
 const proposalStatus = document.querySelector("#proposalStatus");
 
+const jobEditor = document.querySelector("#jobEditor");
+const jobForm = document.querySelector("#jobForm");
+const jobStatusMessage = document.querySelector("#jobStatusMessage");
+const existingClientSelect = document.querySelector("#proposalExistingClient");
+
 let ownerEmail = "";
 let requests = [];
 let proposals = [];
 let clients = [];
+let jobs = [];
 let editingProposal = null;
 let editingRequest = null;
 
@@ -57,7 +63,165 @@ async function getOwnerEmail() {
 
 async function verifyOwner(session) {
   if (!session?.user?.email) return false;
-  if (!ownerEmail) await getOwnerEmail();
+  if (!ownerEmail) 
+document.querySelectorAll("[data-close-job-editor]").forEach((element) => {
+  element.addEventListener("click", closeJobEditor);
+});
+
+function openJobEditor(id) {
+  const job = jobs.find((item) => item.id === id);
+  if (!job) return;
+
+  document.querySelector("#jobId").value = job.id;
+  document.querySelector("#jobEditorTitle").textContent =
+    job.status === "scheduling" ? "Schedule Job" : "Edit Job Schedule";
+  document.querySelector("#jobClientName").textContent = job.client_name || "";
+  document.querySelector("#jobClientEmail").textContent = job.client_email || "";
+  document.querySelector("#jobAddress").textContent =
+    [job.service_address, job.city, job.state, job.postal_code]
+      .filter(Boolean)
+      .join(", ");
+  document.querySelector("#jobServiceTitle").textContent = job.title || "Cleaning Job";
+
+  document.querySelector("#jobDate").value = job.scheduled_date || "";
+  document.querySelector("#jobStartTime").value = job.start_time
+    ? String(job.start_time).slice(0, 5)
+    : "";
+  document.querySelector("#jobEndTime").value = job.end_time
+    ? String(job.end_time).slice(0, 5)
+    : "";
+  document.querySelector("#jobStatus").value = job.status || "scheduling";
+  document.querySelector("#jobSchedulingNotes").value = job.scheduling_notes || "";
+
+  jobStatusMessage.textContent = "";
+  jobEditor.hidden = false;
+}
+
+function closeJobEditor() {
+  jobEditor.hidden = true;
+  jobForm.reset();
+  jobStatusMessage.textContent = "";
+}
+
+async function saveJobSchedule() {
+  const jobId = document.querySelector("#jobId").value;
+  if (!jobId) throw new Error("Job not found.");
+
+  const status = document.querySelector("#jobStatus").value;
+  const now = new Date().toISOString();
+
+  const payload = {
+    scheduled_date: document.querySelector("#jobDate").value || null,
+    start_time: document.querySelector("#jobStartTime").value || null,
+    end_time: document.querySelector("#jobEndTime").value || null,
+    scheduling_notes: document.querySelector("#jobSchedulingNotes").value.trim() || null,
+    status,
+    updated_at: now,
+  };
+
+  if (status === "completed") payload.completed_at = now;
+  if (status === "cancelled") payload.cancelled_at = now;
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .update(payload)
+    .eq("id", jobId)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+
+  await refreshAll();
+  return data;
+}
+
+document.querySelector("#saveJobButton")?.addEventListener("click", async () => {
+  const button = document.querySelector("#saveJobButton");
+  button.disabled = true;
+  button.textContent = "Saving...";
+  jobStatusMessage.className = "form-status";
+  jobStatusMessage.textContent = "";
+
+  try {
+    await saveJobSchedule();
+    jobStatusMessage.className = "form-status success";
+    jobStatusMessage.textContent = "Schedule saved.";
+    button.textContent = "Saved";
+    window.setTimeout(() => {
+      button.textContent = "Save Schedule";
+      button.disabled = false;
+    }, 1000);
+  } catch (error) {
+    console.error(error);
+    jobStatusMessage.className = "form-status error";
+    jobStatusMessage.textContent = error.message || "Could not save schedule.";
+    button.textContent = "Save Schedule";
+    button.disabled = false;
+  }
+});
+
+document.querySelector("#sendBookingButton")?.addEventListener("click", async () => {
+  const button = document.querySelector("#sendBookingButton");
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try {
+    const job = await saveJobSchedule();
+
+    if (!job.scheduled_date || !job.start_time) {
+      throw new Error("Select a date and start time before sending the booking confirmation.");
+    }
+
+    button.textContent = "Sending...";
+
+    const { data, error } = await supabase.functions.invoke(
+      "send-job-confirmation",
+      { body: { job_id: job.id } }
+    );
+
+    if (error) {
+      let message = error.message || "Could not send booking confirmation.";
+
+      try {
+        if (error.context instanceof Response) {
+          const payload = await error.context.clone().json();
+          message =
+            payload?.provider_response?.message ||
+            payload?.message ||
+            payload?.error ||
+            message;
+        }
+      } catch {
+        // Keep original error.
+      }
+
+      throw new Error(message);
+    }
+
+    if (!data?.ok) {
+      throw new Error(data?.message || data?.error || "Could not send booking confirmation.");
+    }
+
+    jobStatusMessage.className = "form-status success";
+    jobStatusMessage.textContent = "Booking confirmation sent.";
+    button.textContent = "Sent";
+
+    await refreshAll();
+
+    window.setTimeout(() => {
+      button.textContent = "Send Booking Confirmation";
+      button.disabled = false;
+    }, 1200);
+  } catch (error) {
+    console.error(error);
+    jobStatusMessage.className = "form-status error";
+    jobStatusMessage.textContent = error.message || "Could not send booking confirmation.";
+    button.textContent = "Send Booking Confirmation";
+    button.disabled = false;
+  }
+});
+
+await getOwnerEmail();
   return session.user.email.toLowerCase() === ownerEmail;
 }
 
@@ -176,13 +340,14 @@ function setView(view) {
     dashboard: "Dashboard",
     requests: "Quote Requests",
     proposals: "Proposals",
+    jobs: "Jobs",
     clients: "Clients",
   };
   document.querySelector("#viewTitle").textContent = titles[view] || "CleanFreaks";
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -195,16 +360,24 @@ async function refreshAll() {
       .from("clients")
       .select("*")
       .order("updated_at", { ascending: false }),
+    supabase
+      .from("jobs")
+      .select("*")
+      .order("scheduled_date", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false }),
   ]);
 
   requests = requestResult.data || [];
   proposals = proposalResult.data || [];
   clients = clientResult.data || [];
+  jobs = jobResult.data || [];
 
   renderStats();
   renderRequests();
   renderProposals();
+  renderJobs();
   renderClients();
+  populateExistingClientSelect();
 }
 
 function renderStats() {
@@ -212,8 +385,7 @@ function renderStats() {
     requests.filter((item) => item.status === "new").length;
   document.querySelector("#statProposals").textContent =
     proposals.filter((item) => ["draft", "sent"].includes(item.status)).length;
-  document.querySelector("#statAccepted").textContent =
-    proposals.filter((item) => item.status === "accepted").length;
+  document.querySelector("#statJobs").textContent = jobs.length;
   document.querySelector("#statClients").textContent = clients.length;
 }
 
@@ -329,6 +501,120 @@ function renderProposals() {
   });
 }
 
+
+function jobDateLabel(job) {
+  if (!job.scheduled_date) return "Not scheduled";
+
+  const date = new Date(job.scheduled_date + "T12:00:00");
+  const day = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+
+  if (!job.start_time) return day;
+
+  const [hour, minute] = String(job.start_time).slice(0, 5).split(":").map(Number);
+  const timeDate = new Date();
+  timeDate.setHours(hour, minute, 0, 0);
+
+  const time = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(timeDate);
+
+  return day + " · " + time;
+}
+
+function renderJobs() {
+  const list = document.querySelector("#jobsList");
+  if (!list) return;
+
+  list.innerHTML = jobs.length
+    ? jobs.map((job) => {
+        const location = [job.city, job.state].filter(Boolean).join(", ");
+        return `
+          <article class="admin-row">
+            <div class="admin-row-main">
+              <strong>${escapeHtml(job.client_name)}</strong>
+              <span>${escapeHtml(job.title || "Cleaning Job")}${location ? " · " + escapeHtml(location) : ""}</span>
+            </div>
+            <div class="admin-row-meta">
+              <span>${escapeHtml(jobDateLabel(job))}</span>
+              <span>${escapeHtml(job.client_email || "")}</span>
+              <span class="status-badge ${escapeHtml(job.status)}">${escapeHtml(job.status.replaceAll("_", " "))}</span>
+            </div>
+            <div class="admin-row-actions">
+              <button type="button" data-schedule-job="${job.id}">Schedule</button>
+              ${job.status === "confirmed" ? '<button type="button" data-copy-booking="' + job.id + '">Copy Booking Link</button>' : ""}
+            </div>
+          </article>
+        `;
+      }).join("")
+    : '<div class="empty-state">Accepted proposals will appear here automatically for scheduling.</div>';
+
+  document.querySelectorAll("[data-schedule-job]").forEach((button) => {
+    button.addEventListener("click", () => openJobEditor(button.dataset.scheduleJob));
+  });
+
+  document.querySelectorAll("[data-copy-booking]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const job = jobs.find((item) => item.id === button.dataset.copyBooking);
+      if (!job) return;
+      const link = window.location.origin + "/booking/?token=" + job.booking_token;
+      await navigator.clipboard.writeText(link);
+      button.textContent = "Copied";
+      window.setTimeout(() => {
+        button.textContent = "Copy Booking Link";
+      }, 1200);
+    });
+  });
+}
+
+function populateExistingClientSelect() {
+  if (!existingClientSelect) return;
+
+  const selected = document.querySelector("#proposalClientId").value || "";
+
+  existingClientSelect.innerHTML =
+    '<option value="">New client / enter manually</option>' +
+    clients.map((client) => {
+      const label = client.company
+        ? client.name + " · " + client.company
+        : client.name;
+      return '<option value="' + client.id + '">' + escapeHtml(label) + '</option>';
+    }).join("");
+
+  existingClientSelect.value = selected;
+}
+
+function fillClientForm(client) {
+  if (!client) return;
+
+  document.querySelector("#proposalClientId").value = client.id || "";
+  document.querySelector("#proposalClientName").value = client.name || "";
+  document.querySelector("#proposalClientEmail").value = client.email || "";
+  document.querySelector("#proposalClientPhone").value = client.phone || "";
+  document.querySelector("#proposalClientCompany").value = client.company || "";
+  document.querySelector("#proposalClientAddress").value = client.address || "";
+  document.querySelector("#proposalClientCity").value = client.city || "";
+  document.querySelector("#proposalClientState").value = client.state || "GA";
+  document.querySelector("#proposalClientZip").value = client.postal_code || "";
+
+  if (existingClientSelect) existingClientSelect.value = client.id || "";
+}
+
+existingClientSelect?.addEventListener("change", () => {
+  const client = clients.find((item) => item.id === existingClientSelect.value);
+
+  if (!client) {
+    document.querySelector("#proposalClientId").value = "";
+    return;
+  }
+
+  fillClientForm(client);
+});
+
 function renderClients() {
   const list = document.querySelector("#clientsList");
 
@@ -427,6 +713,7 @@ function resetEditor() {
   document.querySelector("#proposalId").value = "";
   document.querySelector("#proposalRequestId").value = "";
   document.querySelector("#proposalClientId").value = "";
+  if (existingClientSelect) existingClientSelect.value = "";
   document.querySelector("#proposalClientState").value = "GA";
   document.querySelector("#proposalTitle").value = "Cleaning Proposal";
   document.querySelector("#proposalDiscount").value = "0";
@@ -461,13 +748,20 @@ function openRequestProposal(id) {
   editingRequest = request;
   document.querySelector("#proposalEditorTitle").textContent = "Proposal from Request";
   document.querySelector("#proposalRequestId").value = request.id;
-  document.querySelector("#proposalClientName").value = request.name || "";
-  document.querySelector("#proposalClientEmail").value = request.email || "";
-  document.querySelector("#proposalClientPhone").value = request.phone || "";
-  document.querySelector("#proposalClientAddress").value = request.address || "";
-  document.querySelector("#proposalClientCity").value = request.city || "";
-  document.querySelector("#proposalClientState").value = request.state || "GA";
-  document.querySelector("#proposalClientZip").value = request.postal_code || "";
+
+  const linkedClient = clients.find((item) => item.id === request.client_id);
+
+  if (linkedClient) {
+    fillClientForm(linkedClient);
+  } else {
+    document.querySelector("#proposalClientName").value = request.name || "";
+    document.querySelector("#proposalClientEmail").value = request.email || "";
+    document.querySelector("#proposalClientPhone").value = request.phone || "";
+    document.querySelector("#proposalClientAddress").value = request.address || "";
+    document.querySelector("#proposalClientCity").value = request.city || "";
+    document.querySelector("#proposalClientState").value = request.state || "GA";
+    document.querySelector("#proposalClientZip").value = request.postal_code || "";
+  }
   document.querySelector("#proposalIntroduction").value =
     "Thank you for the opportunity to provide a cleaning proposal. The scope below is based on the information provided in your request.";
 
@@ -503,6 +797,7 @@ async function openExistingProposal(id) {
   document.querySelector("#proposalId").value = proposal.id;
   document.querySelector("#proposalRequestId").value = proposal.quote_request_id || "";
   document.querySelector("#proposalClientId").value = proposal.client_id || "";
+  if (existingClientSelect) existingClientSelect.value = proposal.client_id || "";
   document.querySelector("#proposalClientName").value = proposal.client_name || "";
   document.querySelector("#proposalClientEmail").value = proposal.client_email || "";
   document.querySelector("#proposalTitle").value = proposal.title || "Cleaning Proposal";
