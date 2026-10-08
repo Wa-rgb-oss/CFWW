@@ -1053,3 +1053,157 @@ textarea { resize: vertical; }
     padding-right: 0;
   }
 }
+
+
+/* Careers */
+.careers-hero {
+  background: linear-gradient(135deg, #edf3f3, #f8f9f8);
+}
+
+.careers-page {
+  display: grid;
+  gap: 36px;
+}
+
+.careers-intro {
+  max-width: 760px;
+}
+
+.careers-intro h2,
+.careers-general h2 {
+  margin: 5px 0 10px;
+  color: var(--ink);
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -.045em;
+}
+
+.careers-intro > p:last-child,
+.careers-general p {
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.career-openings {
+  display: grid;
+  gap: 18px;
+}
+
+.career-card {
+  padding: clamp(24px, 4vw, 38px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.career-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.career-card h2 {
+  margin: 5px 0 0;
+  color: var(--ink);
+  font-size: clamp(26px, 3.4vw, 40px);
+  letter-spacing: -.04em;
+}
+
+.career-meta {
+  margin: 0;
+  color: #5b478e;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.career-pay {
+  margin: 8px 0 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.career-summary {
+  max-width: 780px;
+  margin: 22px 0 0;
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.career-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.career-section h3 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.career-section p,
+.career-section li {
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.career-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.career-actions {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.career-actions span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.career-empty,
+.career-loading {
+  padding: 42px 24px;
+  text-align: center;
+  background: #f7f9f9;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+.career-empty h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+
+.careers-general {
+  padding: 32px;
+  background: #f1ecf8;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 700px) {
+  .career-card {
+    padding: 22px 18px;
+  }
+
+  .career-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .career-actions .button {
+    width: 100%;
+  }
+
+  .careers-general {
+    padding: 24px 18px;
+  }
+}
