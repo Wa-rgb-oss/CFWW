@@ -708,3 +708,92 @@ body.admin-body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Monthly website traffic archive */
+.traffic-history {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(11,28,37,.08);
+}
+
+.traffic-history-heading {
+  margin-bottom: 10px;
+}
+
+.traffic-history-heading strong {
+  display: block;
+  font-size: 13px;
+}
+
+.traffic-history-heading span {
+  display: block;
+  margin-top: 2px;
+  color: #71818a;
+  font-size: 10px;
+}
+
+.traffic-history-table {
+  overflow: hidden;
+  border: 1px solid rgba(11,28,37,.08);
+  border-radius: 12px;
+}
+
+.traffic-history-row {
+  display: grid;
+  grid-template-columns: 1.4fr .8fr .8fr .8fr;
+  gap: 12px;
+  padding: 11px 14px;
+  border-top: 1px solid rgba(11,28,37,.07);
+  background: #fff;
+  font-size: 11px;
+}
+
+.traffic-history-row:first-child {
+  border-top: 0;
+}
+
+.traffic-history-header {
+  background: #f6f8f8;
+  color: #71818a;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.traffic-history-row.current {
+  background: #f8f6fb;
+  font-weight: 750;
+}
+
+.traffic-history-row.current em {
+  margin-left: 5px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #e7dff4;
+  color: #5a478d;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.traffic-history-empty {
+  padding: 16px;
+  color: #71818a;
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .traffic-history-row {
+    grid-template-columns: 1.35fr .75fr .75fr;
+  }
+
+  .traffic-history-row > span:last-child,
+  .traffic-history-header > span:last-child {
+    display: none;
+  }
+}
