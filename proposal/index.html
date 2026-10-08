@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cleaning Proposal | CleanFreaks</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/proposal/proposal.css">
+</head>
+<body class="proposal-page">
+  <main class="proposal-shell">
+    <div class="proposal-document" id="proposalDocument">
+      <header class="proposal-header">
+        <div class="proposal-brand">
+          <img src="/assets/brand/header-logo.png" alt="CleanFreaks">
+          <div>
+            <strong>CleanFreaks Window Washing</strong>
+            <span>Marietta, Georgia</span>
+          </div>
+        </div>
+        <div class="proposal-header-meta">
+          <span id="proposalNumber"></span>
+          <span id="proposalStatusBadge" class="proposal-status"></span>
+        </div>
+      </header>
+
+      <section class="proposal-title-block">
+        <p class="eyebrow">Cleaning proposal</p>
+        <h1 id="proposalTitle">Loading proposal...</h1>
+        <p id="proposalIntro"></p>
+      </section>
+
+      <section class="proposal-client-grid">
+        <div>
+          <span>Prepared for</span>
+          <strong id="proposalClient"></strong>
+          <small id="proposalClientEmail"></small>
+        </div>
+        <div>
+          <span>Issued</span>
+          <strong id="proposalIssued"></strong>
+        </div>
+        <div>
+          <span>Valid until</span>
+          <strong id="proposalValid"></strong>
+        </div>
+      </section>
+
+      <section class="proposal-items-section">
+        <div class="proposal-items-header">
+          <span>Scope</span><span>Qty</span><span>Rate</span><span>Total</span>
+        </div>
+        <div id="proposalItems"></div>
+      </section>
+
+      <section class="proposal-total-block">
+        <div><span>Subtotal</span><strong id="proposalSubtotal"></strong></div>
+        <div id="proposalDiscountRow"><span>Discount</span><strong id="proposalDiscount"></strong></div>
+        <div class="grand-total"><span>Proposal total</span><strong id="proposalTotal"></strong></div>
+      </section>
+
+      <section class="proposal-notes" id="proposalNotesSection">
+        <h2>Notes</h2>
+        <p id="proposalNotes"></p>
+      </section>
+
+      <section class="proposal-terms" id="proposalTermsSection">
+        <h2>Terms</h2>
+        <p id="proposalTerms"></p>
+      </section>
+
+      <section class="proposal-response" id="proposalResponse">
+        <div>
+          <h2>Review this proposal</h2>
+          <p>No payment is collected here. Accepting confirms that you approve the scope and pricing so scheduling can be finalized separately.</p>
+        </div>
+        <div class="proposal-response-actions">
+          <button class="button button-outline" id="declineButton" type="button">Decline</button>
+          <button class="button button-accent" id="acceptButton" type="button">Accept Proposal</button>
+        </div>
+      </section>
+
+      <p class="form-status" id="responseStatus" role="status"></p>
+
+      <footer class="proposal-footer">
+        <div>
+          <strong>CleanFreaks Window Washing</strong>
+          <span>(563) 209-4627 · wadejclaussen@gmail.com</span>
+        </div>
+        <button type="button" id="printButton">Print / Save PDF</button>
+      </footer>
+    </div>
+  </main>
+
+  <script type="module" src="/proposal/proposal.js"></script>
+</body>
+</html>
