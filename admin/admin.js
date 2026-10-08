@@ -592,6 +592,7 @@ function renderProposals() {
           <button type="button" data-edit-proposal="${proposal.id}">Edit</button>
           <button type="button" data-copy-proposal="${proposal.id}">Copy Link</button>
           <button type="button" data-email-proposal="${proposal.id}">Email</button>
+          <button class="danger-action" type="button" data-delete-proposal="${proposal.id}">Delete</button>
         </div>
       </article>
     `).join("")
@@ -609,6 +610,42 @@ function renderProposals() {
       setTimeout(() => button.textContent = "Copy Link", 1200);
     });
   });
+  document.querySelectorAll("[data-delete-proposal]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const proposal = proposals.find((item) => item.id === button.dataset.deleteProposal);
+      if (!proposal) return;
+
+      const linkedJob = jobs.find((job) => job.proposal_id === proposal.id);
+
+      const confirmed = window.confirm(
+        "Delete proposal #" +
+          String(proposal.proposal_number || "").padStart(4, "0") +
+          " for " +
+          proposal.client_name +
+          "?\n\n" +
+          (linkedJob
+            ? "This proposal has a linked Job. Deleting it will also permanently delete that Job and its booking link."
+            : "Its proposal line items will also be deleted.") +
+          "\n\nThis cannot be undone."
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("proposals")
+        .delete()
+        .eq("id", proposal.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not delete the proposal.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+
   document.querySelectorAll("[data-email-proposal]").forEach((button) => {
     button.addEventListener("click", async () => {
       const proposal = proposals.find((item) => item.id === button.dataset.emailProposal);
@@ -766,6 +803,7 @@ function renderClients() {
         </div>
         <div class="admin-row-actions">
           ${client.email ? '<button type="button" data-email-client="' + client.id + '">Email</button>' : ""}
+          <button class="danger-action" type="button" data-delete-client="${client.id}">Delete</button>
         </div>
       </article>
     `).join("")
@@ -775,6 +813,34 @@ function renderClients() {
     button.addEventListener("click", () => {
       const client = clients.find((item) => item.id === button.dataset.emailClient);
       if (client?.email) window.location.href = "mailto:" + client.email;
+    });
+  });
+
+  document.querySelectorAll("[data-delete-client]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const client = clients.find((item) => item.id === button.dataset.deleteClient);
+      if (!client) return;
+
+      const confirmed = window.confirm(
+        "Delete the client record for " +
+          client.name +
+          "?\n\nHistorical quote requests, proposals, and Jobs will remain, but they will no longer be linked to this client record.\n\nThis cannot be undone."
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("clients")
+        .delete()
+        .eq("id", client.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not delete the client.");
+        return;
+      }
+
+      await refreshAll();
     });
   });
 }
