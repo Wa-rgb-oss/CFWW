@@ -329,3 +329,105 @@ body.admin-body {
 .proposal-editor[hidden] {
   display: none !important;
 }
+
+
+/* Jobs and reusable client controls */
+.client-picker-label {
+  min-width: 240px;
+  font-size: 10px;
+  color: #71818a;
+}
+
+.client-picker-label select {
+  margin-top: 5px;
+  min-width: 240px;
+}
+
+.job-editor[hidden] {
+  display: none !important;
+}
+
+.job-editor {
+  position: fixed;
+  z-index: 205;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr minmax(520px, 700px);
+}
+
+.job-editor-backdrop {
+  background: rgba(4,13,18,.62);
+}
+
+.job-editor-panel {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 28px;
+  background: #f7f9f9;
+  box-shadow: -25px 0 70px rgba(0,0,0,.2);
+}
+
+.job-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.job-summary strong {
+  font-size: 19px;
+  letter-spacing: -.02em;
+}
+
+.job-summary span {
+  color: #71818a;
+  font-size: 12px;
+}
+
+.status-badge.scheduling {
+  background: #f1ecf8;
+  color: #654f92;
+}
+
+.status-badge.confirmed {
+  background: #e5f4f7;
+  color: #1c6b80;
+}
+
+.status-badge.in_progress {
+  background: #fff1d8;
+  color: #8b621b;
+}
+
+.status-badge.completed {
+  background: #e3f3eb;
+  color: #1d6c48;
+}
+
+.status-badge.cancelled {
+  background: #f6e7e7;
+  color: #8b3838;
+}
+
+@media (max-width: 900px) {
+  .job-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .job-editor-backdrop {
+    display: none;
+  }
+
+  .job-editor-panel {
+    padding: 20px 14px;
+  }
+
+  .client-picker-label,
+  .client-picker-label select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .editor-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
