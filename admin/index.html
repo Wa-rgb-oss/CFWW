@@ -45,6 +45,7 @@
           <button type="button" data-view="proposals">Proposals</button>
           <button type="button" data-view="jobs">Jobs</button>
           <button type="button" data-view="clients">Clients</button>
+          <button type="button" data-view="careers">Careers</button>
         </nav>
         <div class="admin-sidebar-footer">
           <span id="adminEmail"></span>
@@ -209,6 +210,95 @@
             <div id="clientsList" class="admin-list"></div>
           </div>
         </section>
+
+        <section class="admin-view" id="view-careers" data-view-panel="careers">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div>
+                <h2>Careers</h2>
+                <p>Create and manage the job openings shown on the public Careers page.</p>
+              </div>
+              <button class="button button-accent button-small" id="newCareerButton" type="button">New Opening</button>
+            </div>
+            <div id="careersList" class="admin-list"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="career-editor" id="careerEditor" hidden>
+      <div class="proposal-editor-backdrop" data-close-career-editor></div>
+      <div class="career-editor-panel">
+        <header class="proposal-editor-header">
+          <div>
+            <p class="eyebrow">Careers</p>
+            <h2 id="careerEditorTitle">New Opening</h2>
+          </div>
+          <button class="proposal-close" type="button" data-close-career-editor aria-label="Close career editor">×</button>
+        </header>
+
+        <form id="careerForm" class="proposal-form">
+          <input type="hidden" id="careerId">
+
+          <section class="editor-section">
+            <h3>Position</h3>
+            <div class="admin-form-grid">
+              <label>Job title
+                <input id="careerTitle" maxlength="160" required placeholder="Window Cleaning Technician">
+              </label>
+              <label>Employment type
+                <select id="careerEmploymentType">
+                  <option>Part-time</option>
+                  <option>Full-time</option>
+                  <option>Seasonal</option>
+                  <option>Contract</option>
+                </select>
+              </label>
+              <label>Location
+                <input id="careerLocation" maxlength="160" value="Marietta, GA">
+              </label>
+              <label>Pay range
+                <input id="careerPayRange" maxlength="120" placeholder="$18-$24/hr">
+              </label>
+            </div>
+            <label>Short summary
+              <textarea id="careerSummary" rows="3" maxlength="600" placeholder="A short overview shown on the Careers page."></textarea>
+            </label>
+          </section>
+
+          <section class="editor-section">
+            <h3>Job Details</h3>
+            <label>Description
+              <textarea id="careerDescription" rows="8" placeholder="Describe the role, day-to-day work, schedule, and what makes the position a good fit."></textarea>
+            </label>
+            <label>Requirements
+              <textarea id="careerRequirements" rows="7" placeholder="Put each requirement on its own line."></textarea>
+            </label>
+          </section>
+
+          <section class="editor-section">
+            <h3>Publishing</h3>
+            <div class="admin-form-grid">
+              <label>Application email
+                <input id="careerApplicationEmail" type="email" value="info@cleanfreaksmarietta.com">
+              </label>
+              <label>Display order
+                <input id="careerSortOrder" type="number" step="1" value="0">
+              </label>
+            </div>
+            <label class="career-publish-toggle">
+              <input id="careerIsActive" type="checkbox" checked>
+              <span>Published on Careers page</span>
+            </label>
+          </section>
+
+          <footer class="proposal-editor-actions">
+            <button class="button button-outline" id="deleteCareerButton" type="button" hidden>Delete Opening</button>
+            <button class="button button-accent" type="submit">Save Opening</button>
+          </footer>
+
+          <p class="form-status" id="careerStatus" role="status"></p>
+        </form>
       </div>
     </section>
 
