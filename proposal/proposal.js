@@ -1,8 +1,13 @@
-import { createProposalClient } from "/supabase-client.js";
+import { supabase, createProposalClient } from "/supabase-client.js";
 
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
+
 const responseStatus = document.querySelector("#responseStatus");
+const proposalResponse = document.querySelector("#proposalResponse");
+const proposalResult = document.querySelector("#proposalResult");
+const acceptButton = document.querySelector("#acceptButton");
+const declineButton = document.querySelector("#declineButton");
 
 let proposalClient = null;
 let currentProposal = null;
@@ -16,6 +21,7 @@ function money(value) {
 
 function dateLabel(value) {
   if (!value) return "Not specified";
+
   return new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric",
@@ -36,9 +42,48 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+function renderResponseState(status) {
+  const badge = document.querySelector("#proposalStatusBadge");
+
+  badge.textContent = status;
+  badge.className = "proposal-status " + status;
+
+  if (status === "accepted") {
+    proposalResponse.hidden = true;
+    proposalResult.hidden = false;
+    proposalResult.className = "proposal-result accepted";
+    text("#proposalResultMark", "✓");
+    text("#proposalResultKicker", "Response recorded");
+    text("#proposalResultTitle", "Proposal Accepted");
+    text(
+      "#proposalResultCopy",
+      "Thank you. CleanFreaks has received your acceptance. Scheduling will be finalized separately."
+    );
+    responseStatus.textContent = "";
+    return;
+  }
+
+  if (status === "declined") {
+    proposalResponse.hidden = true;
+    proposalResult.hidden = false;
+    proposalResult.className = "proposal-result declined";
+    text("#proposalResultMark", "×");
+    text("#proposalResultKicker", "Response recorded");
+    text("#proposalResultTitle", "Proposal Declined");
+    text(
+      "#proposalResultCopy",
+      "Your response has been recorded. You can contact CleanFreaks directly if you would like to revise the scope or request a new proposal."
+    );
+    responseStatus.textContent = "";
+    return;
+  }
+
+  proposalResult.hidden = true;
+  proposalResponse.hidden = status !== "sent";
+}
+
 async function loadProposal() {
   if (!token) {
-    responseStatus.className = "form-status error";
     responseStatus.textContent = "This proposal link is incomplete.";
     return;
   }
@@ -47,14 +92,17 @@ async function loadProposal() {
 
   const { data: proposal, error } = await proposalClient
     .from("proposals")
-    .select("id,proposal_number,client_name,client_email,title,status,issue_date,valid_until,introduction,notes,terms,subtotal,discount,total")
+    .select(
+      "id,proposal_number,client_name,client_email,title,status,issue_date,valid_until,introduction,notes,terms,subtotal,discount,total"
+    )
     .eq("public_token", token)
     .maybeSingle();
 
   if (error || !proposal) {
     console.error(error);
-    responseStatus.className = "form-status error";
-    responseStatus.textContent = "This proposal could not be found or is not available for review.";
+    responseStatus.textContent =
+      "This proposal could not be found or is not available for review.";
+    proposalResponse.hidden = true;
     return;
   }
 
@@ -69,17 +117,21 @@ async function loadProposal() {
 
   if (itemsError) {
     console.error(itemsError);
-    responseStatus.className = "form-status error";
-    responseStatus.textContent = "The proposal loaded, but its line items could not be displayed.";
+    responseStatus.textContent =
+      "The proposal loaded, but its line items could not be displayed.";
     return;
   }
 
   document.title =
-    "Proposal #" + String(proposal.proposal_number || "").padStart(4, "0") + " | CleanFreaks";
+    "Proposal #" +
+    String(proposal.proposal_number || "").padStart(4, "0") +
+    " | CleanFreaks";
 
-  text("#proposalNumber", "Proposal #" + String(proposal.proposal_number || "").padStart(4, "0"));
-  text("#proposalStatusBadge", proposal.status);
-  document.querySelector("#proposalStatusBadge").className = "proposal-status " + proposal.status;
+  text(
+    "#proposalNumber",
+    "Proposal #" +
+      String(proposal.proposal_number || "").padStart(4, "0")
+  );
   text("#proposalTitle", proposal.title || "Cleaning Proposal");
   text("#proposalIntro", proposal.introduction || "");
   text("#proposalClient", proposal.client_name || "");
@@ -87,21 +139,33 @@ async function loadProposal() {
   text("#proposalIssued", dateLabel(proposal.issue_date));
   text("#proposalValid", dateLabel(proposal.valid_until));
 
+  document.querySelector("#proposalIntroSection").hidden =
+    !proposal.introduction;
+
   const itemsContainer = document.querySelector("#proposalItems");
-  itemsContainer.innerHTML = (items || []).map((item) => {
-    const lineTotal = Number(item.quantity || 0) * Number(item.unit_price || 0);
-    return `
-      <div class="proposal-item">
-        <div class="proposal-item-main">
-          <strong>${escapeHtml(item.description)}</strong>
-          ${item.details ? "<span>" + escapeHtml(item.details) + "</span>" : ""}
+
+  itemsContainer.innerHTML = (items || [])
+    .map((item) => {
+      const lineTotal =
+        Number(item.quantity || 0) * Number(item.unit_price || 0);
+
+      return `
+        <div class="proposal-item">
+          <div class="proposal-item-main">
+            <strong>${escapeHtml(item.description)}</strong>
+            ${
+              item.details
+                ? "<span>" + escapeHtml(item.details) + "</span>"
+                : ""
+            }
+          </div>
+          <span>${Number(item.quantity)}</span>
+          <span>${money(item.unit_price)}</span>
+          <span>${money(lineTotal)}</span>
         </div>
-        <span>${Number(item.quantity)}</span>
-        <span>${money(item.unit_price)}</span>
-        <span>${money(lineTotal)}</span>
-      </div>
-    `;
-  }).join("");
+      `;
+    })
+    .join("");
 
   text("#proposalSubtotal", money(proposal.subtotal));
   text("#proposalDiscount", "-" + money(proposal.discount));
@@ -118,21 +182,11 @@ async function loadProposal() {
   termsSection.hidden = !proposal.terms;
   text("#proposalTerms", proposal.terms || "");
 
-  const response = document.querySelector("#proposalResponse");
-  if (proposal.status !== "sent") {
-    response.hidden = true;
-
-    if (proposal.status === "accepted") {
-      responseStatus.className = "form-status success";
-      responseStatus.textContent = "This proposal has been accepted.";
-    } else if (proposal.status === "declined") {
-      responseStatus.textContent = "This proposal has been declined.";
-    }
-  }
+  renderResponseState(proposal.status);
 }
 
 async function respond(response) {
-  if (!proposalClient || !currentProposal) return;
+  if (!token || !currentProposal) return;
 
   const confirmed = window.confirm(
     response === "accepted"
@@ -142,38 +196,78 @@ async function respond(response) {
 
   if (!confirmed) return;
 
-  responseStatus.className = "form-status";
+  acceptButton.disabled = true;
+  declineButton.disabled = true;
+  responseStatus.className = "proposal-response-status";
   responseStatus.textContent = "Saving response...";
 
-  const now = new Date().toISOString();
-  const payload = {
-    status: response,
-    updated_at: now,
-  };
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      "respond-to-proposal",
+      {
+        body: {
+          token,
+          response,
+        },
+      }
+    );
 
-  if (response === "accepted") payload.accepted_at = now;
-  if (response === "declined") payload.declined_at = now;
+    if (error) {
+      let message = error.message || "Could not save your response.";
 
-  const { data, error } = await proposalClient
-    .from("proposals")
-    .update(payload)
-    .eq("id", currentProposal.id)
-    .select("status")
-    .single();
+      try {
+        if (error.context instanceof Response) {
+          const payload = await error.context.clone().json();
 
-  if (error || !data) {
-    console.error(error);
-    responseStatus.className = "form-status error";
+          if (payload?.error === "proposal_not_open") {
+            message =
+              "This proposal is no longer open for a new response.";
+          } else if (payload?.error === "proposal_not_found") {
+            message = "This proposal could not be found.";
+          } else if (payload?.error) {
+            message = payload.error;
+          }
+        }
+      } catch {
+        // Keep the original error message.
+      }
+
+      throw new Error(message);
+    }
+
+    if (!data?.ok || !["accepted", "declined"].includes(data.status)) {
+      throw new Error("The response was not saved.");
+    }
+
+    currentProposal.status = data.status;
+    renderResponseState(data.status);
+
+    responseStatus.className = "proposal-response-status success";
     responseStatus.textContent =
-      "We could not save your response. Please contact CleanFreaks directly.";
-    return;
-  }
+      data.status === "accepted"
+        ? "Acceptance recorded."
+        : "Decline response recorded.";
 
-  window.location.reload();
+    window.setTimeout(() => {
+      responseStatus.textContent = "";
+    }, 2500);
+  } catch (error) {
+    console.error(error);
+    responseStatus.className = "proposal-response-status";
+    responseStatus.textContent =
+      error.message ||
+      "We could not save your response. Please contact CleanFreaks directly.";
+  } finally {
+    acceptButton.disabled = false;
+    declineButton.disabled = false;
+  }
 }
 
-document.querySelector("#acceptButton").addEventListener("click", () => respond("accepted"));
-document.querySelector("#declineButton").addEventListener("click", () => respond("declined"));
-document.querySelector("#printButton").addEventListener("click", () => window.print());
+acceptButton.addEventListener("click", () => respond("accepted"));
+declineButton.addEventListener("click", () => respond("declined"));
+
+document
+  .querySelector("#printButton")
+  .addEventListener("click", () => window.print());
 
 await loadProposal();
