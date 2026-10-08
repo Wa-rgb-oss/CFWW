@@ -283,7 +283,11 @@ function renderStats() {
   document.querySelector("#statRequests").textContent =
     requests.filter((item) => item.status === "new").length;
   document.querySelector("#statProposals").textContent =
-    proposals.filter((item) => ["draft", "sent"].includes(item.status)).length;
+    proposals.filter(
+      (item) =>
+        !item.archived_at &&
+        ["draft", "sent"].includes(item.status)
+    ).length;
   document.querySelector("#statJobs").textContent = jobs.length;
   document.querySelector("#statClients").textContent = clients.length;
 }
@@ -600,9 +604,14 @@ function renderRequests() {
 
 function renderProposals() {
   const list = document.querySelector("#proposalsList");
+  const archiveList = document.querySelector("#archivedProposalsList");
+  const archiveCount = document.querySelector("#archivedProposalCount");
 
-  list.innerHTML = proposals.length
-    ? proposals.map((proposal) => `
+  const activeProposals = proposals.filter((proposal) => !proposal.archived_at);
+  const archivedProposals = proposals.filter((proposal) => proposal.archived_at);
+
+  list.innerHTML = activeProposals.length
+    ? activeProposals.map((proposal) => `
       <article class="admin-row">
         <div class="admin-row-main">
           <strong>#${String(proposal.proposal_number || "").padStart(4, "0")} · ${escapeHtml(proposal.client_name)}</strong>
@@ -617,15 +626,39 @@ function renderProposals() {
           <button type="button" data-edit-proposal="${proposal.id}">Edit</button>
           <button type="button" data-copy-proposal="${proposal.id}">Copy Link</button>
           <button type="button" data-email-proposal="${proposal.id}">Email</button>
+          <button type="button" data-archive-proposal="${proposal.id}">Archive</button>
+        </div>
+      </article>
+    `).join("")
+    : '<div class="empty-state">No active proposals. Create one from a quote request or use New Proposal.</div>';
+
+  archiveCount.textContent = String(archivedProposals.length);
+
+  archiveList.innerHTML = archivedProposals.length
+    ? archivedProposals.map((proposal) => `
+      <article class="admin-row archived-row">
+        <div class="admin-row-main">
+          <strong>#${String(proposal.proposal_number || "").padStart(4, "0")} · ${escapeHtml(proposal.client_name)}</strong>
+          <span>${escapeHtml(proposal.title)}</span>
+        </div>
+        <div class="admin-row-meta">
+          <span>${money(proposal.total)}</span>
+          <span>Archived ${dateLabel(proposal.archived_at)}</span>
+          <span class="status-badge ${escapeHtml(proposal.status)}">${escapeHtml(proposal.status)}</span>
+        </div>
+        <div class="admin-row-actions">
+          <button type="button" data-restore-proposal="${proposal.id}">Restore</button>
+          <button type="button" data-copy-proposal="${proposal.id}">Copy Link</button>
           <button class="danger-action" type="button" data-delete-proposal="${proposal.id}">Delete</button>
         </div>
       </article>
     `).join("")
-    : '<div class="empty-state">No proposals yet. Create one from a quote request or use New Proposal.</div>';
+    : '<div class="empty-state">No archived proposals.</div>';
 
   document.querySelectorAll("[data-edit-proposal]").forEach((button) => {
     button.addEventListener("click", () => openExistingProposal(button.dataset.editProposal));
   });
+
   document.querySelectorAll("[data-copy-proposal]").forEach((button) => {
     button.addEventListener("click", async () => {
       const proposal = proposals.find((item) => item.id === button.dataset.copyProposal);
@@ -635,15 +668,72 @@ function renderProposals() {
       setTimeout(() => button.textContent = "Copy Link", 1200);
     });
   });
+
+  document.querySelectorAll("[data-archive-proposal]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const proposal = proposals.find((item) => item.id === button.dataset.archiveProposal);
+      if (!proposal) return;
+
+      const confirmed = window.confirm(
+        "Archive proposal #" +
+          String(proposal.proposal_number || "").padStart(4, "0") +
+          " for " +
+          proposal.client_name +
+          "?\n\nIt will move out of the active proposal list but keep its status, history, client link, and any linked Job."
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("proposals")
+        .update({
+          archived_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", proposal.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not archive the proposal.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+
+  document.querySelectorAll("[data-restore-proposal]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const proposal = proposals.find((item) => item.id === button.dataset.restoreProposal);
+      if (!proposal) return;
+
+      const { error } = await supabase
+        .from("proposals")
+        .update({
+          archived_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", proposal.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not restore the proposal.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+
   document.querySelectorAll("[data-delete-proposal]").forEach((button) => {
     button.addEventListener("click", async () => {
       const proposal = proposals.find((item) => item.id === button.dataset.deleteProposal);
-      if (!proposal) return;
+      if (!proposal || !proposal.archived_at) return;
 
       const linkedJob = jobs.find((job) => job.proposal_id === proposal.id);
 
       const confirmed = window.confirm(
-        "Delete proposal #" +
+        "Permanently delete archived proposal #" +
           String(proposal.proposal_number || "").padStart(4, "0") +
           " for " +
           proposal.client_name +
@@ -674,7 +764,7 @@ function renderProposals() {
   document.querySelectorAll("[data-email-proposal]").forEach((button) => {
     button.addEventListener("click", async () => {
       const proposal = proposals.find((item) => item.id === button.dataset.emailProposal);
-      if (!proposal) return;
+      if (!proposal || proposal.archived_at) return;
 
       button.disabled = true;
       const previousLabel = button.textContent;
