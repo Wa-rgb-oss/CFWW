@@ -25,6 +25,8 @@ let requests = [];
 let proposals = [];
 let clients = [];
 let jobs = [];
+let proposalValueAdjustments = [];
+let selectedProposalValueYear = new Date().getFullYear();
 let editingProposal = null;
 let editingRequest = null;
 
@@ -213,7 +215,7 @@ function setView(view) {
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -231,14 +233,20 @@ async function refreshAll() {
       .select("*")
       .order("scheduled_date", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false }),
+    supabase
+      .from("proposal_value_adjustments")
+      .select("*")
+      .order("year", { ascending: false }),
   ]);
 
   requests = requestResult.data || [];
   proposals = proposalResult.data || [];
   clients = clientResult.data || [];
   jobs = jobResult.data || [];
+  proposalValueAdjustments = adjustmentResult.data || [];
 
   renderStats();
+  renderProposalValueDashboard();
   renderRequests();
   renderProposals();
   renderJobs();
@@ -254,6 +262,181 @@ function renderStats() {
   document.querySelector("#statJobs").textContent = jobs.length;
   document.querySelector("#statClients").textContent = clients.length;
 }
+
+function proposalValueYear(proposal) {
+  const value =
+    proposal.status === "accepted"
+      ? proposal.accepted_at || proposal.updated_at || proposal.created_at
+      : proposal.declined_at || proposal.updated_at || proposal.created_at;
+
+  return new Date(value).getFullYear();
+}
+
+function getProposalValueAdjustment(year, status) {
+  return Number(
+    proposalValueAdjustments.find(
+      (item) => Number(item.year) === Number(year) && item.status === status
+    )?.amount || 0
+  );
+}
+
+function availableProposalValueYears() {
+  const years = new Set([new Date().getFullYear()]);
+
+  proposals.forEach((proposal) => {
+    if (["accepted", "declined"].includes(proposal.status)) {
+      years.add(proposalValueYear(proposal));
+    }
+  });
+
+  proposalValueAdjustments.forEach((item) => years.add(Number(item.year)));
+
+  return [...years]
+    .filter(Number.isFinite)
+    .sort((a, b) => b - a);
+}
+
+function renderProposalValueDashboard() {
+  const yearSelect = document.querySelector("#proposalValueYear");
+  if (!yearSelect) return;
+
+  const years = availableProposalValueYears();
+
+  if (!years.includes(Number(selectedProposalValueYear))) {
+    selectedProposalValueYear = years[0] || new Date().getFullYear();
+  }
+
+  yearSelect.innerHTML = years
+    .map(
+      (year) =>
+        '<option value="' +
+        year +
+        '"' +
+        (Number(year) === Number(selectedProposalValueYear) ? " selected" : "") +
+        ">" +
+        year +
+        "</option>"
+    )
+    .join("");
+
+  const acceptedBase = proposals
+    .filter(
+      (proposal) =>
+        proposal.status === "accepted" &&
+        proposalValueYear(proposal) === Number(selectedProposalValueYear)
+    )
+    .reduce((sum, proposal) => sum + Number(proposal.total || 0), 0);
+
+  const declinedBase = proposals
+    .filter(
+      (proposal) =>
+        proposal.status === "declined" &&
+        proposalValueYear(proposal) === Number(selectedProposalValueYear)
+    )
+    .reduce((sum, proposal) => sum + Number(proposal.total || 0), 0);
+
+  const acceptedAdjustment = getProposalValueAdjustment(
+    selectedProposalValueYear,
+    "accepted"
+  );
+  const declinedAdjustment = getProposalValueAdjustment(
+    selectedProposalValueYear,
+    "declined"
+  );
+
+  document.querySelector("#acceptedProposalValue").textContent =
+    money(acceptedBase + acceptedAdjustment);
+
+  document.querySelector("#declinedProposalValue").textContent =
+    money(declinedBase + declinedAdjustment);
+
+  document.querySelector("#acceptedProposalBreakdown").textContent =
+    money(acceptedBase) +
+    " from proposals" +
+    (acceptedAdjustment
+      ? " · " + money(acceptedAdjustment) + " manual adjustment"
+      : "");
+
+  document.querySelector("#declinedProposalBreakdown").textContent =
+    money(declinedBase) +
+    " from proposals" +
+    (declinedAdjustment
+      ? " · " + money(declinedAdjustment) + " manual adjustment"
+      : "");
+
+  document.querySelector("#acceptedValueAdjustment").value =
+    String(acceptedAdjustment);
+
+  document.querySelector("#declinedValueAdjustment").value =
+    String(declinedAdjustment);
+
+  const note =
+    proposalValueAdjustments.find(
+      (item) =>
+        Number(item.year) === Number(selectedProposalValueYear) &&
+        item.note
+    )?.note || "";
+
+  document.querySelector("#proposalValueAdjustmentNote").value = note;
+}
+
+document.querySelector("#proposalValueYear")?.addEventListener("change", (event) => {
+  selectedProposalValueYear = Number(event.target.value);
+  renderProposalValueDashboard();
+});
+
+document.querySelector("#editProposalValuesButton")?.addEventListener("click", () => {
+  renderProposalValueDashboard();
+  document.querySelector("#proposalValueEditor").hidden = false;
+});
+
+document.querySelector("#cancelProposalValuesButton")?.addEventListener("click", () => {
+  document.querySelector("#proposalValueEditor").hidden = true;
+  document.querySelector("#proposalValueStatus").textContent = "";
+});
+
+document.querySelector("#proposalValueEditor")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const status = document.querySelector("#proposalValueStatus");
+  status.className = "form-status";
+  status.textContent = "Saving...";
+
+  const note =
+    document.querySelector("#proposalValueAdjustmentNote").value.trim() || null;
+
+  const rows = [
+    {
+      year: Number(selectedProposalValueYear),
+      status: "accepted",
+      amount: Number(document.querySelector("#acceptedValueAdjustment").value || 0),
+      note,
+      updated_at: new Date().toISOString(),
+    },
+    {
+      year: Number(selectedProposalValueYear),
+      status: "declined",
+      amount: Number(document.querySelector("#declinedValueAdjustment").value || 0),
+      note,
+      updated_at: new Date().toISOString(),
+    },
+  ];
+
+  const { error } = await supabase
+    .from("proposal_value_adjustments")
+    .upsert(rows, { onConflict: "year,status" });
+
+  if (error) {
+    console.error(error);
+    status.className = "form-status error";
+    status.textContent = error.message || "Could not save adjustments.";
+    return;
+  }
+
+  status.className = "form-status success";
+  status.textContent = "Adjustments saved.";
+  await refreshAll();
+});
 
 function requestRow(request) {
   const service = request.services?.name || "General cleaning";
