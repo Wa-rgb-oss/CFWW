@@ -75,6 +75,31 @@ function responseMethodLabel(value) {
   return labels[value] || "response";
 }
 
+async function markQuoteRequestResponded(requestId, via, statusValue = null) {
+  if (!requestId) return;
+
+  const request = requests.find((item) => item.id === requestId);
+  const payload = {};
+
+  if (statusValue) payload.status = statusValue;
+
+  if (!request?.responded_at) {
+    payload.responded_at = new Date().toISOString();
+    payload.responded_via = via;
+  }
+
+  if (!Object.keys(payload).length) return;
+
+  const { error } = await supabase
+    .from("quote_requests")
+    .update(payload)
+    .eq("id", requestId);
+
+  if (error) throw error;
+
+  if (request) Object.assign(request, payload);
+}
+
 async function getOwnerEmail() {
   const { data } = await supabase
     .from("site_settings")
@@ -657,6 +682,11 @@ function renderProposals() {
 
       try {
         await sendProposalEmail(proposal);
+        await markQuoteRequestResponded(
+          proposal.quote_request_id,
+          "proposal",
+          "quoted"
+        );
         button.textContent = "Sent";
         await refreshAll();
         setTimeout(() => {
@@ -1195,7 +1225,10 @@ async function saveProposal(statusOverride = null) {
 
   const requestId = document.querySelector("#proposalRequestId").value;
   if (requestId) {
-    await supabase.from("quote_requests").update({ status: "quoted" }).eq("id", requestId);
+    await supabase
+      .from("quote_requests")
+      .update({ status: "quoted" })
+      .eq("id", requestId);
   }
 
   proposalStatus.className = "form-status success";
@@ -1225,6 +1258,11 @@ document.querySelector("#emailProposalButton").addEventListener("click", async (
 
     button.textContent = "Sending...";
     await sendProposalEmail(proposal);
+    await markQuoteRequestResponded(
+      proposal.quote_request_id,
+      "proposal",
+      "quoted"
+    );
 
     proposalStatus.className = "form-status success";
     proposalStatus.textContent = "Proposal emailed successfully.";
