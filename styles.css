@@ -890,3 +890,106 @@ textarea { resize: vertical; }
   height: 1px !important;
   overflow: hidden !important;
 }
+
+
+/* SEO service landing pages */
+.service-card {
+  color: inherit;
+  text-decoration: none;
+}
+
+.company-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.company-text-link {
+  color: #e7e1f2;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.company-text-link:hover {
+  text-decoration: underline;
+}
+
+.service-seo-hero {
+  background: linear-gradient(135deg, #edf3f3, #f8f9f8);
+}
+
+.service-detail-layout {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 58px;
+  align-items: start;
+}
+
+.service-detail-image {
+  position: sticky;
+  top: 112px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.service-detail-image img {
+  width: 100%;
+  min-height: 460px;
+  object-fit: cover;
+}
+
+.service-detail-copy {
+  display: grid;
+  gap: 40px;
+}
+
+.service-detail-section {
+  padding-bottom: 34px;
+  border-bottom: 1px solid var(--line);
+}
+
+.service-detail-section:last-child {
+  border-bottom: 0;
+}
+
+.service-detail-section h2 {
+  margin: 0 0 15px;
+  color: var(--ink);
+  font-size: clamp(28px, 3.2vw, 42px);
+  letter-spacing: -.04em;
+}
+
+.service-detail-section p,
+.service-detail-section li {
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.service-detail-section ul {
+  margin: 18px 0 0;
+  padding-left: 20px;
+}
+
+@media (max-width: 900px) {
+  .service-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .service-detail-image {
+    position: static;
+  }
+
+  .service-detail-image img {
+    min-height: 280px;
+    max-height: 360px;
+  }
+
+  .company-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
