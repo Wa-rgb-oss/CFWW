@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CleanFreaks Admin</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="admin-body">
+  <main class="admin-root">
+    <section class="admin-login" id="loginView">
+      <div class="admin-login-card">
+        <a href="/" class="admin-login-brand">
+          <img src="/assets/brand/header-logo.png" alt="CleanFreaks">
+        </a>
+        <p class="eyebrow">Owner access</p>
+        <h1>CleanFreaks Admin</h1>
+        <p class="admin-muted">Manage quote requests, clients, and cleaning proposals.</p>
+
+        <form id="loginForm" class="admin-form">
+          <label>Email
+            <input id="loginEmail" type="email" autocomplete="email" required>
+          </label>
+          <label>Password
+            <input id="loginPassword" type="password" autocomplete="current-password" required minlength="8">
+          </label>
+          <button class="button button-accent" type="submit">Sign In</button>
+        </form>
+
+        <button class="admin-text-button" id="createLoginButton" type="button">Create owner login</button>
+        <p class="form-status" id="loginStatus" role="status"></p>
+      </div>
+    </section>
+
+    <section class="admin-app" id="adminApp" hidden>
+      <aside class="admin-sidebar">
+        <a class="admin-brand" href="/">
+          <img src="/assets/brand/header-logo.png" alt="CleanFreaks">
+        </a>
+        <nav class="admin-nav">
+          <button class="active" type="button" data-view="dashboard">Dashboard</button>
+          <button type="button" data-view="requests">Quote Requests</button>
+          <button type="button" data-view="proposals">Proposals</button>
+          <button type="button" data-view="clients">Clients</button>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <span id="adminEmail"></span>
+          <button id="signOutButton" type="button">Sign Out</button>
+        </div>
+      </aside>
+
+      <div class="admin-main">
+        <header class="admin-topbar">
+          <div>
+            <p class="eyebrow">CleanFreaks operations</p>
+            <h1 id="viewTitle">Dashboard</h1>
+          </div>
+          <button class="button button-accent" id="newProposalButton" type="button">New Proposal</button>
+        </header>
+
+        <section class="admin-view active" id="view-dashboard" data-view-panel="dashboard">
+          <div class="admin-stats">
+            <article><span>New requests</span><strong id="statRequests">0</strong></article>
+            <article><span>Open proposals</span><strong id="statProposals">0</strong></article>
+            <article><span>Accepted</span><strong id="statAccepted">0</strong></article>
+            <article><span>Clients</span><strong id="statClients">0</strong></article>
+          </div>
+
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div><h2>Recent requests</h2><p>Newest quote requests from the public site.</p></div>
+              <button type="button" class="admin-text-button" data-jump="requests">View all</button>
+            </div>
+            <div id="dashboardRequests" class="admin-list"></div>
+          </div>
+        </section>
+
+        <section class="admin-view" id="view-requests" data-view-panel="requests">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div><h2>Quote Requests</h2><p>Requests submitted through the website.</p></div>
+            </div>
+            <div id="requestsList" class="admin-list"></div>
+          </div>
+        </section>
+
+        <section class="admin-view" id="view-proposals" data-view-panel="proposals">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div><h2>Proposals</h2><p>Draft, sent, accepted, and declined cleaning proposals.</p></div>
+            </div>
+            <div id="proposalsList" class="admin-list"></div>
+          </div>
+        </section>
+
+        <section class="admin-view" id="view-clients" data-view-panel="clients">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div><h2>Clients</h2><p>Client contact records created from proposals.</p></div>
+            </div>
+            <div id="clientsList" class="admin-list"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="proposal-editor" id="proposalEditor" hidden>
+      <div class="proposal-editor-backdrop" data-close-editor></div>
+      <div class="proposal-editor-panel">
+        <header class="proposal-editor-header">
+          <div>
+            <p class="eyebrow">Proposal builder</p>
+            <h2 id="proposalEditorTitle">New Proposal</h2>
+          </div>
+          <button class="proposal-close" type="button" data-close-editor aria-label="Close proposal builder">×</button>
+        </header>
+
+        <form id="proposalForm" class="proposal-form">
+          <input type="hidden" id="proposalId">
+          <input type="hidden" id="proposalRequestId">
+          <input type="hidden" id="proposalClientId">
+
+          <section class="editor-section">
+            <h3>Client</h3>
+            <div class="admin-form-grid">
+              <label>Client name
+                <input id="proposalClientName" required maxlength="160">
+              </label>
+              <label>Email
+                <input id="proposalClientEmail" type="email" maxlength="320">
+              </label>
+              <label>Phone
+                <input id="proposalClientPhone" type="tel">
+              </label>
+              <label>Company
+                <input id="proposalClientCompany">
+              </label>
+            </div>
+            <label>Address
+              <input id="proposalClientAddress">
+            </label>
+            <div class="admin-form-grid three">
+              <label>City
+                <input id="proposalClientCity">
+              </label>
+              <label>State
+                <input id="proposalClientState" maxlength="2" value="GA">
+              </label>
+              <label>ZIP
+                <input id="proposalClientZip">
+              </label>
+            </div>
+          </section>
+
+          <section class="editor-section">
+            <h3>Proposal details</h3>
+            <div class="admin-form-grid">
+              <label>Title
+                <input id="proposalTitle" value="Cleaning Proposal" required>
+              </label>
+              <label>Valid until
+                <input id="proposalValidUntil" type="date">
+              </label>
+            </div>
+            <label>Introduction
+              <textarea id="proposalIntroduction" rows="4" placeholder="Thank the client and summarize the scope."></textarea>
+            </label>
+          </section>
+
+          <section class="editor-section">
+            <div class="editor-section-heading">
+              <h3>Line items</h3>
+              <button class="admin-text-button" id="addLineItemButton" type="button">+ Add item</button>
+            </div>
+            <div id="lineItems" class="line-items"></div>
+          </section>
+
+          <section class="editor-section">
+            <div class="admin-form-grid">
+              <label>Discount
+                <input id="proposalDiscount" type="number" min="0" step="0.01" value="0">
+              </label>
+              <div class="proposal-totals">
+                <span>Subtotal <strong id="proposalSubtotal">$0.00</strong></span>
+                <span>Total <strong id="proposalTotal">$0.00</strong></span>
+              </div>
+            </div>
+            <label>Notes
+              <textarea id="proposalNotes" rows="4" placeholder="Scheduling notes, exclusions, or client-specific information."></textarea>
+            </label>
+            <label>Terms
+              <textarea id="proposalTerms" rows="5">Proposal pricing is based on the scope described above. Changes to access, condition, quantity, or requested work may require a revised proposal. Scheduling is confirmed separately. No payment is collected through this website.</textarea>
+            </label>
+          </section>
+
+          <footer class="proposal-editor-actions">
+            <button class="button button-outline" id="saveDraftButton" type="button">Save Draft</button>
+            <button class="button button-accent" id="emailProposalButton" type="button">Save & Email Proposal</button>
+          </footer>
+
+          <p class="form-status" id="proposalStatus" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>
