@@ -1,10 +1,31 @@
 // CFWW Supabase client
-// The publishable key is designed for browser/client use.
-// Database access must still be protected with Row Level Security (RLS).
+// The publishable key is intended for browser use. Row Level Security controls data access.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.117.3";
 
-const supabaseUrl = "https://jsrvcmsnsbuuhtwtqvoq.supabase.co";
-const supabasePublishableKey = "sb_publishable_NapgM6sZ3p8W9oFGxY-GrQ_j1nEvrxo";
+export const SUPABASE_URL = "https://jsrvcmsnsbuuhtwtqvoq.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NapgM6sZ3p8W9oFGxY-GrQ_j1nEvrxo";
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey);
+export const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+export function createProposalClient(token) {
+  return createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      global: {
+        headers: {
+          "x-proposal-token": token,
+        },
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    }
+  );
+}
