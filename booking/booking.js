@@ -1,4 +1,4 @@
-import { createBookingClient } from "/supabase-client.js";
+import { createBookingClient, trackSitePageView } from "/supabase-client.js";
 
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
@@ -263,3 +263,7 @@ async function loadBooking() {
 }
 
 await loadBooking();
+
+trackSitePageView("/booking/").catch((error) => {
+  console.warn("Site analytics failed.", error);
+});
