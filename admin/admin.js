@@ -484,12 +484,91 @@ function renderRequests() {
   });
 
   document.querySelectorAll("[data-contact-request]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const request = requests.find((item) => item.id === button.dataset.contactRequest);
       if (!request) return;
-      window.location.href = "mailto:" + request.email + "?subject=" +
-        encodeURIComponent("CleanFreaks quote request") +
-        "&body=" + encodeURIComponent("Hi " + request.name + ",\n\nThanks for reaching out to CleanFreaks.\n\n");
+
+      if (!request.responded_at) {
+        const now = new Date().toISOString();
+
+        const { error } = await supabase
+          .from("quote_requests")
+          .update({
+            status: "contacted",
+            responded_at: now,
+            responded_via: "email",
+          })
+          .eq("id", request.id);
+
+        if (error) {
+          console.error(error);
+          alert("Could not record the response time.");
+          return;
+        }
+
+        request.status = "contacted";
+        request.responded_at = now;
+        request.responded_via = "email";
+      }
+
+      window.location.href =
+        "mailto:" + request.email +
+        "?subject=" + encodeURIComponent("CleanFreaks quote request") +
+        "&body=" + encodeURIComponent(
+          "Hi " + request.name + ",\n\nThanks for reaching out to CleanFreaks.\n\n"
+        );
+    });
+  });
+
+  document.querySelectorAll("[data-mark-responded]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const request = requests.find((item) => item.id === button.dataset.markResponded);
+      if (!request) return;
+
+      const { error } = await supabase
+        .from("quote_requests")
+        .update({
+          status: request.status === "new" ? "contacted" : request.status,
+          responded_at: new Date().toISOString(),
+          responded_via: "other",
+        })
+        .eq("id", request.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not mark this request as responded.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+
+  document.querySelectorAll("[data-delete-request]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const request = requests.find((item) => item.id === button.dataset.deleteRequest);
+      if (!request) return;
+
+      const confirmed = window.confirm(
+        "Delete the quote request from " +
+          request.name +
+          "?\n\nThe client record and any proposals or Jobs already created from it will remain.\n\nThis cannot be undone."
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("quote_requests")
+        .delete()
+        .eq("id", request.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not delete the quote request.");
+        return;
+      }
+
+      await refreshAll();
     });
   });
 }
