@@ -993,3 +993,49 @@ textarea { resize: vertical; }
     flex-direction: column;
   }
 }
+
+
+/* FAQ */
+.faq-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-page details {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-page details:first-child {
+  border-top: 1px solid var(--line);
+}
+
+.faq-page summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  list-style: none;
+}
+
+.faq-page summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-page summary::after {
+  content: "+";
+  float: right;
+  color: #5b478e;
+  font-size: 22px;
+}
+
+.faq-page details[open] summary::after {
+  content: "−";
+}
+
+.faq-page details p {
+  max-width: 760px;
+  margin: 12px 0 0;
+  color: var(--text);
+  line-height: 1.75;
+}
