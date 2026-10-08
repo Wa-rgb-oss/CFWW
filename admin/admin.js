@@ -912,6 +912,20 @@ async function saveProposal(statusOverride = null) {
 
   let clientId = document.querySelector("#proposalClientId").value || null;
 
+  if (!clientId && clientPayload.email) {
+    const matchingClient = clients.find(
+      (client) =>
+        String(client.email || "").toLowerCase() ===
+        String(clientPayload.email || "").toLowerCase()
+    );
+
+    if (matchingClient) {
+      clientId = matchingClient.id;
+      document.querySelector("#proposalClientId").value = clientId;
+      if (existingClientSelect) existingClientSelect.value = clientId;
+    }
+  }
+
   if (clientId) {
     const { error } = await supabase.from("clients").update(clientPayload).eq("id", clientId);
     if (error) throw error;
@@ -920,6 +934,7 @@ async function saveProposal(statusOverride = null) {
     if (error) throw error;
     clientId = data.id;
     document.querySelector("#proposalClientId").value = clientId;
+    if (existingClientSelect) existingClientSelect.value = clientId;
   }
 
   const totals = recalcTotals();
