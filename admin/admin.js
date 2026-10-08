@@ -291,25 +291,24 @@ function renderProposals() {
       const proposal = proposals.find((item) => item.id === button.dataset.emailProposal);
       if (!proposal) return;
 
-      let ready = proposal;
-      if (proposal.status === "draft") {
-        const { data, error } = await supabase
-          .from("proposals")
-          .update({ status: "sent", sent_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-          .eq("id", proposal.id)
-          .select("*")
-          .single();
+      button.disabled = true;
+      const previousLabel = button.textContent;
+      button.textContent = "Sending...";
 
-        if (error) {
-          alert("Could not mark this proposal as sent.");
-          return;
-        }
-
-        ready = data;
+      try {
+        await sendProposalEmail(proposal);
+        button.textContent = "Sent";
         await refreshAll();
+        setTimeout(() => {
+          button.textContent = previousLabel;
+          button.disabled = false;
+        }, 1400);
+      } catch (error) {
+        console.error(error);
+        button.textContent = previousLabel;
+        button.disabled = false;
+        alert(error.message || "Could not send the proposal email.");
       }
-
-      openEmail(ready);
     });
   });
 }
@@ -347,17 +346,35 @@ function proposalLink(proposal) {
   return window.location.origin + "/proposal/?token=" + proposal.public_token;
 }
 
-function openEmail(proposal) {
-  if (!proposal.client_email) return;
-  const subject = "CleanFreaks Proposal #" + String(proposal.proposal_number || "").padStart(4, "0");
-  const body =
-    "Hi " + proposal.client_name + ",\n\n" +
-    "Here is your CleanFreaks cleaning proposal:\n" +
-    proposalLink(proposal) +
-    "\n\nPlease review the scope and pricing. You can accept or decline the proposal from that page.\n\nThank you,\nCleanFreaks Window Washing";
-  window.location.href = "mailto:" + proposal.client_email +
-    "?subject=" + encodeURIComponent(subject) +
-    "&body=" + encodeURIComponent(body);
+async function sendProposalEmail(proposal) {
+  if (!proposal?.id) {
+    throw new Error("Save the proposal before emailing it.");
+  }
+
+  if (!proposal.client_email) {
+    throw new Error("Add a client email address before sending the proposal.");
+  }
+
+  const { data, error } = await supabase.functions.invoke("send-proposal-email", {
+    body: { proposal_id: proposal.id },
+  });
+
+  if (error) {
+    const detail = error?.context?.body?.message || error?.message || "";
+    if (String(detail).includes("email_provider_not_configured")) {
+      throw new Error("Proposal email is ready, but the outbound email provider still needs to be connected.");
+    }
+    throw new Error(detail || "The proposal email could not be sent.");
+  }
+
+  if (!data?.ok) {
+    if (data?.error === "email_provider_not_configured") {
+      throw new Error("Proposal email is ready, but the outbound email provider still needs to be connected.");
+    }
+    throw new Error(data?.message || "The proposal email could not be sent.");
+  }
+
+  return data;
 }
 
 document.querySelector("#newProposalButton").addEventListener("click", () => openNewProposal());
@@ -648,13 +665,32 @@ document.querySelector("#saveDraftButton").addEventListener("click", async () =>
 });
 
 document.querySelector("#emailProposalButton").addEventListener("click", async () => {
+  const button = document.querySelector("#emailProposalButton");
   try {
-    const proposal = await saveProposal("sent");
-    if (proposal) openEmail(proposal);
+    button.disabled = true;
+    button.textContent = "Saving...";
+    const proposal = await saveProposal();
+
+    if (!proposal) return;
+
+    button.textContent = "Sending...";
+    await sendProposalEmail(proposal);
+
+    proposalStatus.className = "form-status success";
+    proposalStatus.textContent = "Proposal emailed successfully.";
+    button.textContent = "Sent";
+    await refreshAll();
+
+    setTimeout(() => {
+      button.textContent = "Save & Email Proposal";
+      button.disabled = false;
+    }, 1400);
   } catch (error) {
     console.error(error);
     proposalStatus.className = "form-status error";
-    proposalStatus.textContent = error.message || "Could not save proposal.";
+    proposalStatus.textContent = error.message || "Could not send proposal email.";
+    button.textContent = "Save & Email Proposal";
+    button.disabled = false;
   }
 });
 
