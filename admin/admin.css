@@ -826,3 +826,40 @@ body.admin-body {
       calc(14px + env(safe-area-inset-bottom));
   }
 }
+
+
+/* Mobile editor scroll and safe-area handling */
+@media (max-width: 900px) {
+  .proposal-editor,
+  .career-editor {
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .proposal-editor-panel,
+  .career-editor-panel {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(110px + env(safe-area-inset-bottom));
+  }
+  .proposal-editor-actions {
+    position: static;
+    margin: 10px 0 0;
+    padding: 14px 0 calc(24px + env(safe-area-inset-bottom));
+  }
+}
+.career-editor[hidden] { display: none !important; }
+.career-editor { position: fixed; z-index: 210; inset: 0; display: grid; grid-template-columns: 1fr minmax(520px,760px); }
+.career-editor-panel { height: 100vh; overflow-y: auto; padding: 28px; background: #f7f9f9; }
+@media (max-width: 900px) {
+  .career-editor { grid-template-columns: 1fr; }
+  .career-editor-panel { height: 100dvh; max-height: 100dvh; padding: 20px 14px calc(110px + env(safe-area-inset-bottom)); }
+}
