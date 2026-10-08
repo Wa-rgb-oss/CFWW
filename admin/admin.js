@@ -50,6 +50,29 @@ function dateLabel(value) {
     .format(new Date(value));
 }
 
+function dateTimeLabel(value) {
+  if (!value) return "";
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function responseMethodLabel(value) {
+  const labels = {
+    email: "email",
+    proposal: "proposal",
+    phone: "phone",
+    other: "manual",
+  };
+
+  return labels[value] || "response";
+}
+
 async function getOwnerEmail() {
   const { data } = await supabase
     .from("site_settings")
