@@ -26,7 +26,8 @@ let proposals = [];
 let clients = [];
 let jobs = [];
 let proposalValueAdjustments = [];
-let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0 };
+let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0, page_views_month: 0, sessions_month: 0 };
+let analyticsMonthly = [];
 let selectedProposalValueYear = new Date().getFullYear();
 let editingProposal = null;
 let editingRequest = null;
@@ -241,7 +242,7 @@ function setView(view) {
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult, analyticsResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -267,6 +268,10 @@ async function refreshAll() {
       .from("site_analytics_summary")
       .select("*")
       .single(),
+    supabase
+      .from("site_analytics_monthly")
+      .select("*")
+      .order("month_start", { ascending: false }),
   ]);
 
   requests = requestResult.data || [];
@@ -279,10 +284,14 @@ async function refreshAll() {
     sessions: 0,
     page_views_30d: 0,
     sessions_30d: 0,
+    page_views_month: 0,
+    sessions_month: 0,
   };
+  analyticsMonthly = analyticsMonthlyResult.data || [];
 
   renderStats();
   renderTrafficSummary();
+  renderTrafficHistory();
   renderProposalValueDashboard();
   renderRequests();
   renderProposals();
@@ -320,6 +329,56 @@ function renderTrafficSummary() {
   document.querySelector("#sitePageViews30d").textContent =
     number.format(Number(analyticsSummary.page_views_30d || 0)) +
     " in the last 30 days";
+}
+function renderTrafficHistory() {
+  const container = document.querySelector("#trafficHistoryRows");
+  if (!container) return;
+
+  const number = new Intl.NumberFormat("en-US");
+  const currentMonthLabel = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
+  const currentSessions = Number(analyticsSummary.sessions_month || 0);
+  const currentViews = Number(analyticsSummary.page_views_month || 0);
+  const currentRatio = currentSessions
+    ? (currentViews / currentSessions).toFixed(1)
+    : "0.0";
+
+  const currentRow = `
+    <div class="traffic-history-row current">
+      <span>${currentMonthLabel} <em>Live</em></span>
+      <span>${number.format(currentSessions)}</span>
+      <span>${number.format(currentViews)}</span>
+      <span>${currentRatio}</span>
+    </div>
+  `;
+
+  const archivedRows = analyticsMonthly.map((row) => {
+    const date = new Date(row.month_start + "T12:00:00");
+    const label = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+    }).format(date);
+
+    const sessions = Number(row.sessions || 0);
+    const views = Number(row.page_views || 0);
+    const ratio = sessions ? (views / sessions).toFixed(1) : "0.0";
+
+    return `
+      <div class="traffic-history-row">
+        <span>${escapeHtml(label)}</span>
+        <span>${number.format(sessions)}</span>
+        <span>${number.format(views)}</span>
+        <span>${ratio}</span>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML =
+    currentRow +
+    (archivedRows || '<div class="traffic-history-empty">Completed months will appear here automatically.</div>');
 }
 
 function proposalValueYear(proposal) {
