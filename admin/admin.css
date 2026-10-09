@@ -1158,3 +1158,64 @@ body.admin-body {
     flex: 1;
   }
 }
+
+
+/* Employee access */
+.employee-access-form {
+  max-width: 660px;
+  margin-bottom: 18px;
+}
+
+.employee-access-form > label {
+  display: grid;
+  gap: 7px;
+  color: #163746;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.employee-access-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.employee-access-entry input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid #cbd5d9;
+  border-radius: 10px;
+  background: #fff;
+  color: #0b1c25;
+  font: inherit;
+}
+
+.employee-access-note {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #ded7e9;
+  border-radius: 11px;
+  background: #f8f6fb;
+  color: #665d73;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.employee-access-list {
+  margin-top: 8px;
+}
+
+.employee-access-row .admin-row-main strong {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 620px) {
+  .employee-access-entry {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-access-entry .button {
+    width: 100%;
+  }
+}
