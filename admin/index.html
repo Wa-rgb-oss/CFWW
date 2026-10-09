@@ -46,6 +46,7 @@
           <button type="button" data-view="jobs">Jobs</button>
           <button type="button" data-view="clients">Clients</button>
           <button type="button" data-view="careers">Careers</button>
+          <button type="button" data-view="employees">Employees</button>
         </nav>
         <div class="admin-sidebar-footer">
           <span id="adminEmail"></span>
@@ -248,6 +249,41 @@
               </div>
             </div>
             <div id="careerApplicantsList" class="career-applicants-list"></div>
+          </div>
+        </section>
+
+        <section class="admin-view" id="view-employees" data-view-panel="employees">
+          <div class="admin-panel">
+            <div class="admin-panel-heading">
+              <div>
+                <h2>Employee Access</h2>
+                <p>Approve the email addresses allowed to sign in to the CleanFreaks employee portal.</p>
+              </div>
+            </div>
+
+            <form id="employeeAccessForm" class="employee-access-form">
+              <label>
+                Approved employee email
+                <div class="employee-access-entry">
+                  <input
+                    id="employeeAccessEmail"
+                    type="email"
+                    maxlength="320"
+                    autocomplete="email"
+                    placeholder="employee@cleanfreaksmarietta.com"
+                    required
+                  >
+                  <button class="button button-accent button-small" type="submit">Add Access</button>
+                </div>
+              </label>
+              <p class="form-status" id="employeeAccessStatus" role="status"></p>
+            </form>
+
+            <div class="employee-access-note">
+              Removing an email revokes employee-portal authorization. Employee accounts do not receive access to the Admin client list.
+            </div>
+
+            <div id="employeeAccessList" class="admin-list employee-access-list"></div>
           </div>
         </section>
       </div>
