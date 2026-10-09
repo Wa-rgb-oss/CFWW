@@ -34,6 +34,7 @@ let clients = [];
 let jobs = [];
 let careers = [];
 let careerApplications = [];
+let employeeAccess = [];
 let proposalValueAdjustments = [];
 let analyticsSummary = { page_views: 0, sessions: 0, page_views_30d: 0, sessions_30d: 0, page_views_month: 0, sessions_month: 0 };
 let analyticsMonthly = [];
@@ -247,12 +248,13 @@ function setView(view) {
     jobs: "Jobs",
     clients: "Clients",
     careers: "Careers",
+    employees: "Employees",
   };
   document.querySelector("#viewTitle").textContent = titles[view] || "CleanFreaks";
 }
 
 async function refreshAll() {
-  const [requestResult, proposalResult, clientResult, jobResult, careerResult, applicationResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
+  const [requestResult, proposalResult, clientResult, jobResult, careerResult, applicationResult, employeeAccessResult, adjustmentResult, analyticsResult, analyticsMonthlyResult] = await Promise.all([
     supabase
       .from("quote_requests")
       .select("*, services(name)")
@@ -280,6 +282,10 @@ async function refreshAll() {
       .select("*")
       .order("submitted_at", { ascending: false }),
     supabase
+      .from("employee_access")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase
       .from("proposal_value_adjustments")
       .select("*")
       .order("year", { ascending: false }),
@@ -299,6 +305,7 @@ async function refreshAll() {
   jobs = jobResult.data || [];
   careers = careerResult.data || [];
   careerApplications = applicationResult.data || [];
+  employeeAccess = employeeAccessResult.data || [];
   proposalValueAdjustments = adjustmentResult.data || [];
   analyticsSummary = analyticsResult.data || {
     page_views: 0,
@@ -320,6 +327,7 @@ async function refreshAll() {
   renderClients();
   renderCareers();
   renderCareerApplications();
+  renderEmployeeAccess();
   populateExistingClientSelect();
 }
 
@@ -1102,6 +1110,114 @@ function renderClients() {
 }
 
 document.querySelector("#clientSearch")?.addEventListener("input", renderClients);
+
+
+function renderEmployeeAccess() {
+  const list = document.querySelector("#employeeAccessList");
+  if (!list) return;
+
+  list.innerHTML = employeeAccess.length
+    ? employeeAccess.map((entry) => `
+      <article class="admin-row employee-access-row">
+        <div class="admin-row-main">
+          <strong>${escapeHtml(entry.email)}</strong>
+          <span>Approved employee login</span>
+        </div>
+        <div class="admin-row-meta">
+          <span>Added ${escapeHtml(dateLabel(entry.created_at))}</span>
+        </div>
+        <div class="admin-row-actions">
+          <button
+            class="danger-action"
+            type="button"
+            data-remove-employee-access="${entry.id}"
+          >
+            Remove Access
+          </button>
+        </div>
+      </article>
+    `).join("")
+    : '<div class="empty-state">No employee emails have been approved yet.</div>';
+
+  document.querySelectorAll("[data-remove-employee-access]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const entry = employeeAccess.find(
+        (item) => item.id === button.dataset.removeEmployeeAccess
+      );
+      if (!entry) return;
+
+      const confirmed = window.confirm(
+        "Remove employee access for " + entry.email + "?\n\nThey will no longer be authorized to use the employee portal."
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("employee_access")
+        .delete()
+        .eq("id", entry.id);
+
+      if (error) {
+        console.error(error);
+        alert("Could not remove employee access.");
+        return;
+      }
+
+      await refreshAll();
+    });
+  });
+}
+
+document.querySelector("#employeeAccessForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const input = document.querySelector("#employeeAccessEmail");
+  const status = document.querySelector("#employeeAccessStatus");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const email = String(input?.value || "").trim().toLowerCase();
+
+  status.className = "form-status";
+  status.textContent = "";
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    status.className = "form-status error";
+    status.textContent = "Enter a valid employee email address.";
+    return;
+  }
+
+  if (employeeAccess.some((entry) => entry.email.toLowerCase() === email)) {
+    status.className = "form-status error";
+    status.textContent = "That email already has employee access.";
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Adding...";
+
+  try {
+    const { error } = await supabase
+      .from("employee_access")
+      .insert({ email });
+
+    if (error) throw error;
+
+    input.value = "";
+    status.className = "form-status success";
+    status.textContent = "Employee access added.";
+    await refreshAll();
+  } catch (error) {
+    console.error(error);
+    status.className = "form-status error";
+    status.textContent =
+      error?.code === "23505"
+        ? "That email already has employee access."
+        : "Could not add employee access.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Add Access";
+  }
+});
 
 function renderCareers() {
   const list = document.querySelector("#careersList");
