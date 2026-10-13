@@ -75,7 +75,7 @@
             <div class="admin-panel-heading">
               <div>
                 <h2>Proposal Value</h2>
-                <p>Accepted and declined proposal value by year.</p>
+                <p>Pending, accepted, and declined proposal value by year.</p>
               </div>
               <div class="proposal-value-controls">
                 <select id="proposalValueYear" aria-label="Proposal value year"></select>
@@ -88,6 +88,11 @@
                 <span>Accepted</span>
                 <strong id="acceptedProposalValue">$0.00</strong>
                 <small id="acceptedProposalBreakdown">From accepted proposals</small>
+              </article>
+              <article class="proposal-value-card pending">
+                <span>Pending</span>
+                <strong id="pendingProposalValue">$0.00</strong>
+                <small id="pendingProposalBreakdown">From open proposals</small>
               </article>
               <article class="proposal-value-card declined">
                 <span>Declined</span>
