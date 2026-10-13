@@ -456,7 +456,7 @@ body.admin-body {
 
 .proposal-value-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 13px;
 }
 
@@ -468,6 +468,10 @@ body.admin-body {
 
 .proposal-value-card.accepted {
   background: #edf7f2;
+}
+
+.proposal-value-card.pending {
+  background: #fff7e6;
 }
 
 .proposal-value-card.declined {
@@ -493,6 +497,10 @@ body.admin-body {
 
 .proposal-value-card.accepted strong {
   color: #1d6c48;
+}
+
+.proposal-value-card.pending strong {
+  color: #8b621b;
 }
 
 .proposal-value-card.declined strong {
