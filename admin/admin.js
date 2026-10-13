@@ -413,10 +413,13 @@ function renderTrafficHistory() {
 }
 
 function proposalValueYear(proposal) {
-  const value =
-    proposal.status === "accepted"
-      ? proposal.accepted_at || proposal.updated_at || proposal.created_at
-      : proposal.declined_at || proposal.updated_at || proposal.created_at;
+  let value = proposal.created_at || proposal.updated_at;
+
+  if (proposal.status === "accepted") {
+    value = proposal.accepted_at || proposal.updated_at || proposal.created_at;
+  } else if (proposal.status === "declined") {
+    value = proposal.declined_at || proposal.updated_at || proposal.created_at;
+  }
 
   return new Date(value).getFullYear();
 }
@@ -433,7 +436,11 @@ function availableProposalValueYears() {
   const years = new Set([new Date().getFullYear()]);
 
   proposals.forEach((proposal) => {
-    if (["accepted", "declined"].includes(proposal.status)) {
+    const isPending =
+      !proposal.archived_at &&
+      ["draft", "sent"].includes(proposal.status);
+
+    if (["accepted", "declined"].includes(proposal.status) || isPending) {
       years.add(proposalValueYear(proposal));
     }
   });
@@ -476,6 +483,15 @@ function renderProposalValueDashboard() {
     )
     .reduce((sum, proposal) => sum + Number(proposal.total || 0), 0);
 
+  const pendingBase = proposals
+    .filter(
+      (proposal) =>
+        !proposal.archived_at &&
+        ["draft", "sent"].includes(proposal.status) &&
+        proposalValueYear(proposal) === Number(selectedProposalValueYear)
+    )
+    .reduce((sum, proposal) => sum + Number(proposal.total || 0), 0);
+
   const declinedBase = proposals
     .filter(
       (proposal) =>
@@ -496,6 +512,9 @@ function renderProposalValueDashboard() {
   document.querySelector("#acceptedProposalValue").textContent =
     money(acceptedBase + acceptedAdjustment);
 
+  document.querySelector("#pendingProposalValue").textContent =
+    money(pendingBase);
+
   document.querySelector("#declinedProposalValue").textContent =
     money(declinedBase + declinedAdjustment);
 
@@ -505,6 +524,9 @@ function renderProposalValueDashboard() {
     (acceptedAdjustment
       ? " · " + money(acceptedAdjustment) + " manual adjustment"
       : "");
+
+  document.querySelector("#pendingProposalBreakdown").textContent =
+    money(pendingBase) + " from draft and sent proposals";
 
   document.querySelector("#declinedProposalBreakdown").textContent =
     money(declinedBase) +
