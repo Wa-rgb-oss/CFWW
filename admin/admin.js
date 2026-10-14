@@ -1851,6 +1851,13 @@ async function openExistingProposal(id) {
     document.querySelector("#proposalClientCity").value = client.city || "";
     document.querySelector("#proposalClientState").value = client.state || "GA";
     document.querySelector("#proposalClientZip").value = client.postal_code || "";
+  } else {
+    document.querySelector("#proposalClientPhone").value = proposal.client_phone || "";
+    document.querySelector("#proposalClientCompany").value = proposal.client_company || "";
+    document.querySelector("#proposalClientAddress").value = proposal.client_address || "";
+    document.querySelector("#proposalClientCity").value = proposal.client_city || "";
+    document.querySelector("#proposalClientState").value = proposal.client_state || "GA";
+    document.querySelector("#proposalClientZip").value = proposal.client_postal_code || "";
   }
 
   lineItems.innerHTML = "";
@@ -1981,6 +1988,12 @@ async function saveProposal(statusOverride = null) {
     client_id: clientId,
     client_name: clientName,
     client_email: clientPayload.email,
+    client_phone: clientPayload.phone,
+    client_company: clientPayload.company,
+    client_address: clientPayload.address,
+    client_city: clientPayload.city,
+    client_state: clientPayload.state,
+    client_postal_code: clientPayload.postal_code,
     quote_request_id: document.querySelector("#proposalRequestId").value || null,
     title: document.querySelector("#proposalTitle").value.trim() || "Cleaning Proposal",
     valid_until: document.querySelector("#proposalValidUntil").value || null,
