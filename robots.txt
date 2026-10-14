@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /employee/
 Disallow: /proposal/
 Disallow: /booking/
 
