@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CleanFreaks Employee Portal</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#24183f">
+  <link rel="icon" href="/assets/brand/footer-logo.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/employee/employee.css">
+</head>
+<body class="employee-body">
+  <section class="employee-login" id="employeeLogin">
+    <div class="employee-login-card">
+      <img src="/assets/brand/footer-logo.png" alt="CleanFreaks" class="employee-login-logo">
+      <p class="eyebrow">Employee Portal</p>
+      <h1>CleanFreaks Employee Access</h1>
+      <p class="employee-login-copy">
+        Sign in with an email approved by CleanFreaks Admin.
+      </p>
+
+      <form id="employeeLoginForm" class="employee-login-form">
+        <label>Email
+          <input id="employeeLoginEmail" type="email" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input id="employeeLoginPassword" type="password" autocomplete="current-password" minlength="8" required>
+        </label>
+        <button class="button button-accent" type="submit">Sign In</button>
+      </form>
+
+      <button class="employee-create-login" id="employeeCreateLoginButton" type="button">
+        Create employee login
+      </button>
+
+      <p class="form-status" id="employeeLoginStatus" role="status"></p>
+      <a class="employee-home-link" href="/">Back to CleanFreaks</a>
+    </div>
+  </section>
+
+  <section class="employee-app" id="employeeApp" hidden>
+    <aside class="employee-sidebar">
+      <a class="employee-brand" href="/employee/" aria-label="CleanFreaks employee home">
+        <img src="/assets/brand/footer-logo.png" alt="CleanFreaks">
+      </a>
+
+      <nav class="employee-nav">
+        <button class="active" type="button" data-employee-view="dashboard">Dashboard</button>
+        <button type="button" data-employee-view="calculator">Quote Calculator</button>
+        <button type="button" data-employee-view="proposals">My Proposals</button>
+      </nav>
+
+      <div class="employee-sidebar-footer">
+        <span id="employeeEmail"></span>
+        <button id="employeeSignOutButton" type="button">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="employee-main">
+      <header class="employee-topbar">
+        <div>
+          <p class="eyebrow">CleanFreaks operations</p>
+          <h1 id="employeeViewTitle">Dashboard</h1>
+        </div>
+        <button class="button button-accent" id="employeeNewProposalButton" type="button">
+          New Proposal
+        </button>
+      </header>
+
+      <section class="employee-view active" data-employee-panel="dashboard">
+        <div class="employee-stats">
+          <article>
+            <span>Open proposals</span>
+            <strong id="employeeStatOpen">0</strong>
+          </article>
+          <article>
+            <span>Accepted</span>
+            <strong id="employeeStatAccepted">0</strong>
+          </article>
+          <article>
+            <span>Pending value</span>
+            <strong id="employeeStatPendingValue">$0.00</strong>
+          </article>
+        </div>
+
+        <div class="employee-panel">
+          <div class="employee-panel-heading">
+            <div>
+              <h2>Quick Tools</h2>
+              <p>Build a quote or create a proposal without accessing the client database.</p>
+            </div>
+          </div>
+          <div class="employee-quick-actions">
+            <button class="employee-tool-card" type="button" data-employee-jump="calculator">
+              <strong>Quote Calculator</strong>
+              <span>Use the original CleanFreaks window pricing calculator.</span>
+            </button>
+            <button class="employee-tool-card" type="button" id="dashboardNewProposalButton">
+              <strong>New Proposal</strong>
+              <span>Manually enter client information and build a proposal.</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="employee-panel">
+          <div class="employee-panel-heading">
+            <div>
+              <h2>Recent Proposals</h2>
+              <p>Your most recently created proposals.</p>
+            </div>
+            <button class="employee-text-button" type="button" data-employee-jump="proposals">
+              View all
+            </button>
+          </div>
+          <div id="employeeRecentProposals" class="employee-list"></div>
+        </div>
+      </section>
+
+      <section class="employee-view" data-employee-panel="calculator">
+        <div class="employee-panel calculator-panel">
+          <div class="employee-panel-heading">
+            <div>
+              <h2>Window Cleaning Quote Calculator</h2>
+              <p>Select quantities using the original CleanFreaks item pricing.</p>
+            </div>
+            <button class="employee-text-button" id="calculatorResetButton" type="button">Reset</button>
+          </div>
+
+          <div id="calculatorItems" class="calculator-items"></div>
+
+          <div class="calculator-summary">
+            <div class="calculator-selected">
+              <h3>Selected Items</h3>
+              <div id="calculatorSelectedItems" class="calculator-selected-items">
+                No items selected.
+              </div>
+            </div>
+
+            <div class="calculator-totals">
+              <article>
+                <span>Exterior Only</span>
+                <strong id="calculatorExterior">$0.00</strong>
+                <button type="button" data-use-quote="exterior">Build Proposal</button>
+              </article>
+              <article>
+                <span>Interior Only</span>
+                <strong id="calculatorInterior">$0.00</strong>
+                <button type="button" data-use-quote="interior">Build Proposal</button>
+              </article>
+              <article>
+                <span>Interior + Exterior</span>
+                <strong id="calculatorFull">$0.00</strong>
+                <button type="button" data-use-quote="full">Build Proposal</button>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="employee-view" data-employee-panel="proposals">
+        <div class="employee-panel">
+          <div class="employee-panel-heading">
+            <div>
+              <h2>My Proposals</h2>
+              <p>Only proposals created from your employee account appear here.</p>
+            </div>
+          </div>
+          <div id="employeeProposalsList" class="employee-list"></div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <section class="employee-proposal-editor" id="employeeProposalEditor" hidden>
+    <div class="employee-editor-backdrop" data-close-employee-proposal></div>
+    <div class="employee-editor-panel">
+      <header class="employee-editor-header">
+        <div>
+          <p class="eyebrow">Employee Proposal Builder</p>
+          <h2 id="employeeProposalEditorTitle">New Proposal</h2>
+        </div>
+        <button class="employee-editor-close" type="button" data-close-employee-proposal aria-label="Close proposal builder">×</button>
+      </header>
+
+      <form id="employeeProposalForm" class="employee-proposal-form">
+        <input type="hidden" id="employeeProposalId">
+
+        <section class="employee-editor-section">
+          <h3>Client</h3>
+          <p class="employee-editor-note">Enter the client information manually. Employee accounts cannot access the CleanFreaks client list.</p>
+          <div class="employee-form-grid">
+            <label>Client name
+              <input id="employeeClientName" maxlength="160" required>
+            </label>
+            <label>Email
+              <input id="employeeClientEmail" type="email" maxlength="320">
+            </label>
+            <label>Phone
+              <input id="employeeClientPhone" type="tel" maxlength="80">
+            </label>
+            <label>Company
+              <input id="employeeClientCompany" maxlength="160">
+            </label>
+          </div>
+          <label>Service address
+            <input id="employeeClientAddress" maxlength="240">
+          </label>
+          <div class="employee-form-grid three">
+            <label>City
+              <input id="employeeClientCity" maxlength="120">
+            </label>
+            <label>State
+              <input id="employeeClientState" maxlength="2" value="GA">
+            </label>
+            <label>ZIP
+              <input id="employeeClientZip" maxlength="20">
+            </label>
+          </div>
+        </section>
+
+        <section class="employee-editor-section">
+          <h3>Proposal Details</h3>
+          <div class="employee-form-grid">
+            <label>Title
+              <input id="employeeProposalTitle" value="Cleaning Proposal" required>
+            </label>
+            <label>Valid until
+              <input id="employeeProposalValidUntil" type="date">
+            </label>
+          </div>
+          <label>Introduction
+            <textarea id="employeeProposalIntroduction" rows="4"></textarea>
+          </label>
+        </section>
+
+        <section class="employee-editor-section">
+          <div class="employee-editor-section-heading">
+            <h3>Scope & Pricing</h3>
+            <button class="employee-text-button" id="employeeAddLineItemButton" type="button">Add Line Item</button>
+          </div>
+          <div id="employeeLineItems" class="employee-line-items"></div>
+          <div class="employee-form-grid">
+            <label>Discount
+              <input id="employeeProposalDiscount" type="number" min="0" step="0.01" value="0">
+            </label>
+            <div class="employee-proposal-totals">
+              <span>Subtotal <strong id="employeeProposalSubtotal">$0.00</strong></span>
+              <span>Total <strong id="employeeProposalTotal">$0.00</strong></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="employee-editor-section">
+          <h3>Notes & Terms</h3>
+          <label>Notes
+            <textarea id="employeeProposalNotes" rows="4"></textarea>
+          </label>
+          <label>Terms
+            <textarea id="employeeProposalTerms" rows="6"></textarea>
+          </label>
+        </section>
+
+        <footer class="employee-editor-actions">
+          <button class="button button-outline" id="employeeSaveDraftButton" type="submit">Save Draft</button>
+          <button class="button button-accent" id="employeeSendProposalButton" type="button">Save & Email Proposal</button>
+        </footer>
+
+        <p class="form-status" id="employeeProposalStatus" role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <script type="module" src="/employee/employee.js"></script>
+</body>
+</html>
