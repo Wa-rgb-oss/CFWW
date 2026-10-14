@@ -1,4 +1,21 @@
-import { supabase } from "/supabase-client.js";
+import {
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+} from "/supabase-client.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.117.3";
+
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      storageKey: "cfww_employee_auth",
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);
 
 const loginView = document.querySelector("#employeeLogin");
 const appView = document.querySelector("#employeeApp");
