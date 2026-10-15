@@ -303,6 +303,17 @@ button { cursor: pointer; }
   font-weight: 850;
   letter-spacing: -.04em;
 }
+.plan-card .plan-cadence {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 5px 11px;
+  color: var(--ink-2);
+  background: var(--accent-soft);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .01em;
+}
 .plan-card h3 { margin: 16px 0 8px; font-size: 21px; line-height: 1.2; }
 .plan-card p { margin: 0; color: var(--muted); font-size: 13px; }
 
