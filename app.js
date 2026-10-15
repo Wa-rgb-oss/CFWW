@@ -33,7 +33,7 @@ async function loadMaintenancePlans() {
 
   const { data, error } = await supabase
     .from("maintenance_plans")
-    .select("id,name,description,total_price,billing_period_count,display_index")
+    .select("id,name,description,total_price,service_interval_months,display_index")
     .eq("active", true)
     .eq("visibility", "PUBLIC")
     .order("display_index")
@@ -51,19 +51,30 @@ async function loadMaintenancePlans() {
     const card = document.createElement("article");
     card.className = "plan-card";
 
-    const priceMatch = (plan.description || "").match(/\$(\d+(?:\.\d+)?)\/mo/i);
+    const yearlyPrice = Number(plan.total_price);
+    const hasYearlyPrice = plan.total_price != null && Number.isFinite(yearlyPrice) && yearlyPrice > 0;
+    const intervalMonths = Number(plan.service_interval_months);
+    const yearlyVisits = intervalMonths > 0 && 12 % intervalMonths === 0
+      ? 12 / intervalMonths
+      : 0;
+
     const price = document.createElement("div");
     price.className = "plan-price";
-    price.textContent = priceMatch ? "$" + priceMatch[1] + "/mo" : money(plan.total_price || 0);
+    price.textContent = hasYearlyPrice ? "From " + money(yearlyPrice) + "/year" : "Request a quote";
 
     const cadence = document.createElement("div");
     cadence.className = "plan-cadence";
-    const yearlyVisits = Number(plan.billing_period_count);
-    cadence.textContent = yearlyVisits === 4
+    cadence.textContent = intervalMonths === 3
       ? "Quarterly cleaning · 4 visits/year"
-      : yearlyVisits === 3
+      : intervalMonths === 4
         ? "Every 4 months · 3 visits/year"
         : "Recurring maintenance";
+
+    const visitRate = document.createElement("p");
+    visitRate.className = "plan-visit-rate";
+    visitRate.textContent = hasYearlyPrice && yearlyVisits
+      ? "From " + money(yearlyPrice / yearlyVisits) + " per scheduled cleaning"
+      : "";
 
     const title = document.createElement("h3");
     title.textContent = plan.name;
@@ -71,7 +82,7 @@ async function loadMaintenancePlans() {
     const copy = document.createElement("p");
     copy.textContent = plan.description || "Recurring window maintenance.";
 
-    card.append(price, cadence, title, copy);
+    card.append(price, cadence, title, visitRate, copy);
     grid.appendChild(card);
   });
 }
