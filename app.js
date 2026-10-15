@@ -56,13 +56,22 @@ async function loadMaintenancePlans() {
     price.className = "plan-price";
     price.textContent = priceMatch ? "$" + priceMatch[1] + "/mo" : money(plan.total_price || 0);
 
+    const cadence = document.createElement("div");
+    cadence.className = "plan-cadence";
+    const yearlyVisits = Number(plan.billing_period_count);
+    cadence.textContent = yearlyVisits === 4
+      ? "Quarterly cleaning · 4 visits/year"
+      : yearlyVisits === 3
+        ? "Every 4 months · 3 visits/year"
+        : "Recurring maintenance";
+
     const title = document.createElement("h3");
     title.textContent = plan.name;
 
     const copy = document.createElement("p");
     copy.textContent = plan.description || "Recurring window maintenance.";
 
-    card.append(price, title, copy);
+    card.append(price, cadence, title, copy);
     grid.appendChild(card);
   });
 }
