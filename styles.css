@@ -315,6 +315,12 @@ button { cursor: pointer; }
   letter-spacing: .01em;
 }
 .plan-card h3 { margin: 16px 0 8px; font-size: 21px; line-height: 1.2; }
+.plan-card .plan-visit-rate {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 700;
+}
 .plan-card p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .about-section {
