@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.cleanfreaksmarietta.com/</loc><lastmod>2026-10-14</lastmod></url>
-  <url><loc>https://www.cleanfreaksmarietta.com/window-cleaning/</loc><lastmod>2026-10-14</lastmod></url>
-  <url><loc>https://www.cleanfreaksmarietta.com/commercial-window-cleaning/</loc><lastmod>2026-10-14</lastmod></url>
-  <url><loc>https://www.cleanfreaksmarietta.com/exterior-cleaning/</loc><lastmod>2026-10-14</lastmod></url>
-  <url><loc>https://www.cleanfreaksmarietta.com/vehicle-care/</loc><lastmod>2026-10-14</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url><loc>https://www.cleanfreaksmarietta.com/</loc><lastmod>2026-10-14</lastmod><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/brand/large-logo.png</image:loc></image:image><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/hero/window-cleaners.jpeg</image:loc></image:image><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/window.jpg</image:loc></image:image><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/pressure.jpg</image:loc></image:image><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/vehicle.jpg</image:loc></image:image></url>
+  <url><loc>https://www.cleanfreaksmarietta.com/window-cleaning/</loc><lastmod>2026-10-14</lastmod><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/window.jpg</image:loc></image:image></url>
+  <url><loc>https://www.cleanfreaksmarietta.com/commercial-window-cleaning/</loc><lastmod>2026-10-14</lastmod><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/commercial/building.jpg</image:loc></image:image></url>
+  <url><loc>https://www.cleanfreaksmarietta.com/exterior-cleaning/</loc><lastmod>2026-10-14</lastmod><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/pressure.jpg</image:loc></image:image></url>
+  <url><loc>https://www.cleanfreaksmarietta.com/vehicle-care/</loc><lastmod>2026-10-14</lastmod><image:image><image:loc>https://www.cleanfreaksmarietta.com/assets/services/vehicle.jpg</image:loc></image:image></url>
   <url><loc>https://www.cleanfreaksmarietta.com/service-areas/</loc><lastmod>2026-10-14</lastmod></url>
   <url><loc>https://www.cleanfreaksmarietta.com/service-areas/marietta-ga/</loc><lastmod>2026-10-14</lastmod></url>
   <url><loc>https://www.cleanfreaksmarietta.com/service-areas/sandy-springs-ga/</loc><lastmod>2026-10-14</lastmod></url>
