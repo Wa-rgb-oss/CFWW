@@ -271,10 +271,20 @@ body.admin-body {
 }
 
 @media (max-width: 900px) {
-  .admin-app { grid-template-columns: 1fr; }
+  /*
+   * Use normal block flow on mobile instead of a one-column grid.
+   * With min-height: 100vh, CSS Grid was stretching the automatic
+   * sidebar row to fill unused viewport space, so the dark nav bar
+   * changed height based on how much content the active tab contained.
+   */
+  .admin-app {
+    display: block;
+    min-height: 100vh;
+  }
   .admin-sidebar {
     position: static;
     height: auto;
+    min-height: 0;
     padding: 13px 15px;
     flex-direction: row;
     align-items: center;
