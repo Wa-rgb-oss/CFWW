@@ -1,4 +1,7 @@
 import { supabase } from "/supabase-client.js";
+import { initializeJobCosts, updateJobCostOptions, openJobCosts } from "/admin/job-costs.js";
+
+initializeJobCosts();
 
 const loginView = document.querySelector("#loginView");
 const adminApp = document.querySelector("#adminApp");
@@ -246,6 +249,7 @@ function setView(view) {
     requests: "Quote Requests",
     proposals: "Proposals",
     jobs: "Jobs",
+    costs: "Job Costs",
     clients: "Clients",
     careers: "Careers",
     employees: "Employees",
@@ -324,6 +328,7 @@ async function refreshAll() {
   renderRequests();
   renderProposals();
   renderJobs();
+  updateJobCostOptions(jobs, proposals);
   renderClients();
   renderCareers();
   renderCareerApplications();
@@ -980,12 +985,20 @@ function renderJobs() {
             </div>
             <div class="admin-row-actions">
               <button type="button" data-schedule-job="${job.id}">Schedule</button>
+              <button type="button" data-job-costs="${job.id}">Costs & Mileage</button>
               ${job.status === "confirmed" ? '<button type="button" data-copy-booking="' + job.id + '">Copy Booking Link</button>' : ""}
             </div>
           </article>
         `;
       }).join("")
     : '<div class="empty-state">Accepted proposals will appear here automatically for scheduling.</div>';
+
+  document.querySelectorAll("[data-job-costs]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setView("costs");
+      openJobCosts(button.dataset.jobCosts);
+    });
+  });
 
   document.querySelectorAll("[data-schedule-job]").forEach((button) => {
     button.addEventListener("click", () => openJobEditor(button.dataset.scheduleJob));
