@@ -44,6 +44,7 @@
           <button type="button" data-view="requests">Quote Requests</button>
           <button type="button" data-view="proposals">Proposals</button>
           <button type="button" data-view="jobs">Jobs</button>
+          <button type="button" data-view="costs">Job Costs</button>
           <button type="button" data-view="clients">Clients</button>
           <button type="button" data-view="careers">Careers</button>
           <button type="button" data-view="employees">Employees</button>
@@ -207,6 +208,63 @@
             <div id="jobsList" class="admin-list"></div>
           </div>
         </section>
+
+        <section class="admin-view" id="view-costs" data-view-panel="costs">
+  <div class="admin-panel job-costs-panel">
+    <div class="admin-panel-heading">
+      <div><h2>Job Costs & Mileage</h2><p>Private expense and trip records tied to each accepted job.</p></div>
+      <label class="cost-job-picker">Select job <select id="costJobSelect" aria-label="Select a job"></select></label>
+    </div>
+    <p class="form-status" id="costStatus" role="status"></p>
+    <div id="costWorkspace" hidden>
+      <div class="cost-summary-grid">
+        <article><span>Proposal value</span><strong id="costRevenue">$0.00</strong></article>
+        <article><span>Cash expenses</span><strong id="costExpenses">$0.00</strong></article>
+        <article><span>Mileage allowance</span><strong id="costMileageAmount">$0.00</strong><small id="costMiles">0 miles</small></article>
+        <article><span>Estimated job margin</span><strong id="costMargin">$0.00</strong><small>Before overhead and taxes</small></article>
+      </div>
+      <p class="cost-disclaimer">Profit estimate = accepted proposal amount − expenses − optional mileage allowance. Mileage is not automatically treated as an additional cash expense. Enter actual fuel purchases under Expenses, and avoid double-counting the same vehicle cost.</p>
+      <div class="cost-form-grid">
+        <section class="editor-section">
+          <h3 id="expenseHeading">Add expense</h3>
+          <form id="costExpenseForm" class="proposal-form">
+            <input type="hidden" id="costExpenseId">
+            <div class="admin-form-grid">
+              <label>Date<input id="costExpenseDate" type="date" required></label>
+              <label>Category<select id="costExpenseCategory">
+                <option value="supplies">Supplies & chemicals</option><option value="equipment">Equipment & rental</option><option value="labor">Labor</option><option value="fuel">Fuel</option><option value="parking_tolls">Parking & tolls</option><option value="subcontractor">Subcontractor</option><option value="other">Other</option>
+              </select></label>
+              <label>Amount ($)<input id="costExpenseAmount" type="number" min="0" max="10000000" step="0.01" required></label>
+              <label>Vendor (optional)<input id="costExpenseVendor" maxlength="200"></label>
+            </div>
+            <label>Description<input id="costExpenseDescription" maxlength="500" required placeholder="e.g. Cleaning chemicals"></label>
+            <div class="cost-form-actions"><button class="button button-accent button-small" type="submit">Save Expense</button><button class="button button-outline button-small" id="costExpenseCancel" type="button">Clear</button></div>
+          </form>
+        </section>
+        <section class="editor-section">
+          <h3 id="mileageHeading">Log trip</h3>
+          <form id="costMileageForm" class="proposal-form">
+            <input type="hidden" id="costMileageId">
+            <div class="admin-form-grid">
+              <label>Date<input id="costTripDate" type="date" required></label>
+              <label>Miles driven<input id="costTripMiles" type="number" min="0" max="100000" step="0.01" required></label>
+              <label>From<input id="costTripOrigin" maxlength="200" placeholder="Starting location"></label>
+              <label>To<input id="costTripDestination" maxlength="200" placeholder="Job site"></label>
+              <label>Rate ($/mile, optional)<input id="costTripRate" type="number" min="0" max="100" step="0.0001" value="0"></label>
+              <label>Purpose<input id="costTripPurpose" maxlength="250" value="Job travel"></label>
+            </div>
+            <label>Notes<input id="costTripNotes" maxlength="500" placeholder="Optional trip details"></label>
+            <div class="cost-form-actions"><button class="button button-accent button-small" type="submit">Save Trip</button><button class="button button-outline button-small" id="costMileageCancel" type="button">Clear</button></div>
+          </form>
+        </section>
+      </div>
+      <div class="cost-form-grid">
+        <section class="admin-panel cost-log-panel"><h2>Expense history</h2><div class="admin-list" id="costExpenseList"></div></section>
+        <section class="admin-panel cost-log-panel"><h2>Mileage history</h2><div class="admin-list" id="costMileageList"></div></section>
+      </div>
+    </div>
+  </div>
+</section>
 
         <section class="admin-view" id="view-clients" data-view-panel="clients">
           <div class="admin-panel">
