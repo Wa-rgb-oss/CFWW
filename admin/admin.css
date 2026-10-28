@@ -1237,3 +1237,28 @@ body.admin-body {
     width: 100%;
   }
 }
+
+
+/* Job cost tracking — admin only */
+.job-costs-panel { display:grid; gap:18px; }
+.cost-job-picker { display:grid; gap:6px; min-width:220px; font-size:11px; font-weight:800; }
+.cost-job-picker select { padding:11px; border:1px solid #cbd5d9; border-radius:10px; background:#fff; max-width:100%; }
+.cost-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.cost-summary-grid article { padding:18px; border:1px solid #dbe3e6; border-radius:13px; background:#f8fafb; }
+.cost-summary-grid span,.cost-summary-grid small { display:block; color:#71818a; font-size:11px; }
+.cost-summary-grid strong { display:block; font-size:25px; margin:5px 0; overflow-wrap:anywhere; }
+.cost-disclaimer { font-size:12px; color:#61727a; line-height:1.55; }
+.cost-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.cost-form-grid .editor-section { align-content:start; }
+.cost-form-grid label { display:grid; gap:6px; font-size:11px; font-weight:800; color:#163746; }
+.cost-form-grid input,.cost-form-grid select { width:100%; min-width:0; padding:11px; border:1px solid #cbd5d9; border-radius:9px; font:inherit; background:#fff; color:#0b1c25; }
+.cost-form-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.cost-log-panel { min-width:0; }
+.cost-log-panel h2 { margin:0 0 15px; font-size:19px; }
+.cost-record { padding:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; border:1px solid #dde5e8; border-radius:11px; }
+.cost-record div:first-child { min-width:0; flex:1; }
+.cost-record strong { display:block; overflow-wrap:anywhere; }
+.cost-record span { display:block; font-size:11px; color:#71818a; margin-top:3px; overflow-wrap:anywhere; }
+.cost-record button { padding:7px 10px; background:#fff; border:1px solid #cbd5d9; border-radius:9px; font-size:11px; }
+@media(max-width:900px){.cost-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.cost-form-grid { grid-template-columns:1fr; }.job-costs-panel .admin-panel-heading { align-items:stretch; flex-direction:column; }}
+@media(max-width:480px){.cost-summary-grid { grid-template-columns:1fr 1fr; }.cost-summary-grid strong { font-size:20px; }.cost-form-grid .admin-form-grid { grid-template-columns:1fr; }}
