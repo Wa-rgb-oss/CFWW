@@ -106,7 +106,7 @@ function renderEntry(parent, item, key, done) {
         ? table.upsert(record, { ignoreDuplicates: true })
         : table.delete().match(record)));
       }
-      if (mode() === "bills") await load();
+      if (mode() === "bills" || mode() === "today") await load();
     } catch (error) {
       checkbox.checked = !checkbox.checked;
       throw error;
@@ -154,6 +154,18 @@ async function load() {
   const done = new Set(checked(doneResult).map((row) => row.item_id + row.occurs_on));
   const grid = $("days");
   grid.replaceChildren();
+  $("daily-summary").hidden = !today;
+  grid.classList.toggle("timeline", today);
+  if (today) {
+    const key = dateKey(first);
+    const agenda = items.filter((item) => occurs(item, first, key));
+    const complete = agenda.filter((item) => done.has(item.id + key)).length;
+    $("daily-date").textContent = dayName.format(first);
+    $("daily-progress").textContent = agenda.length ? complete + " of " + agenda.length + " items complete" : "Nothing on the agenda yet";
+    $("progress-bar").max = Math.max(1, agenda.length);
+    $("progress-bar").value = complete;
+    $("daily-dinner").textContent = agenda.filter((item) => item.category === "Dinner").map((item) => item.title).join(", ") || "Nothing planned yet";
+  }
   grid.classList.toggle("calendar-grid", monthGrid || current === "week");
   $("calendar-zoom").hidden = activeView !== "week";
   $("previous").hidden = $("next").hidden = $("today").hidden = tasks;
@@ -194,7 +206,7 @@ async function load() {
     }
     return;
   }
-  $("period").textContent = today ? dayName.format(first) : weekly
+  $("period").textContent = today ? "Timeline" : weekly
     ? dayName.format(first) + " – " + dayName.format(last) : monthName.format(first);
   if (monthGrid) {
     for (const name of ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]) {
@@ -210,7 +222,7 @@ async function load() {
     if (bills && !entries.length) continue;
     const card = element("article", "", grid);
     if (key === dateKey(new Date())) card.className = "today";
-    element("h3", monthGrid ? String(date.getDate()) : dayName.format(date), card);
+    if (!today) element("h3", monthGrid ? String(date.getDate()) : dayName.format(date), card);
     if (!entries.length && !monthGrid) element("p", current === "meals" ? "Dinner not planned" : "Nothing scheduled", card).className = "meta";
     for (const item of entries) {
       const complete = done.has(item.id + key);
@@ -335,7 +347,7 @@ editor.onsubmit = (event) => {
 
 field("category").onchange = () => { $("amount-label").hidden = field("category").value !== "Bill"; };
 $("cancel").onclick = () => edit(null);
-$("new-item").onclick = () => newItem();
+$("new-item").onclick = $("mobile-add").onclick = () => newItem();
 for (const button of document.querySelectorAll("[data-mode]")) {
   button.onclick = () => switchView(button.dataset.mode);
 }

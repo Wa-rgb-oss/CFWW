@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <title>Life Organizer</title>
-  <link rel="stylesheet" href="/personal-calendar/calendar.css">
+  <link rel="stylesheet" href="/personal-calendar/calendar.css?v=mobile1">
 </head>
 <body>
 <main>
@@ -18,11 +18,12 @@
   </form>
   <section id="calendar" hidden>
     <nav class="organizer-nav" aria-label="Organizer views">
-      <button type="button" data-mode="today">Today</button>
-      <button type="button" data-mode="week">Calendar</button>
-      <button type="button" data-mode="tasks">Tasks &amp; Routines</button>
-      <button type="button" data-mode="meals">Meal Plan</button>
-      <button type="button" data-mode="bills">Bills</button>
+      <button type="button" data-mode="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v10h-6v-6H9v6H3z"/></svg>Today</button>
+      <button type="button" data-mode="week"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v15H4z M8 3v6 M16 3v6 M4 11h16"/></svg>Calendar</button>
+      <button type="button" data-mode="tasks"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M8 12l3 3 5-6"/></svg><span class="desktop-task-label">Tasks &amp; Routines</span><span class="mobile-task-label">Tasks</span></button>
+      <button type="button" data-mode="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3v5a3 3 0 006 0V3 M7 3v18 M19 3c-4 2-4 8 0 9v9 M19 3v9"/></svg>Meal Plan</button>
+      <button type="button" data-mode="bills"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2z M8 8h8 M8 12h8"/></svg>Bills</button>
+      <button class="mobile-add" id="mobile-add" type="button" aria-label="Add an item">+</button>
     </nav>
     <div class="organizer-workspace">
     <section class="organizer-board" aria-labelledby="period">
@@ -34,6 +35,12 @@
       <button id="new-item">+ New item</button>
       <button id="refresh">Refresh</button>
       <button id="logout">Sign out</button>
+    </div>
+    <div id="daily-summary" hidden>
+      <p id="daily-date"></p>
+      <h2>Your day at a glance</h2>
+      <div class="progress-card"><strong id="daily-progress"></strong><progress id="progress-bar" aria-label="Daily completion"></progress></div>
+      <div class="dinner-card"><strong>Dinner</strong><span id="daily-dinner"></span></div>
     </div>
     <h2 id="period"></h2>
     <div id="days"></div>
@@ -65,6 +72,6 @@
     </details>
   </section>
 </main>
-<script type="module" src="/personal-calendar/calendar.js"></script>
+<script type="module" src="/personal-calendar/calendar.js?v=mobile1"></script>
 </body>
 </html>

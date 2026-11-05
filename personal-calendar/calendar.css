@@ -43,3 +43,37 @@ main { width: min(1500px, 96%); }
   .organizer-workspace { grid-template-columns: minmax(0,1fr); }
   #editor { scroll-margin: 1rem; }
 }
+
+.organizer-nav svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.organizer-nav button { display: inline-flex; align-items: center; gap: .4rem; }
+.organizer-nav .mobile-add, .mobile-task-label { display: none; }
+#daily-date { color: #52627e; font-size: .82rem; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+#daily-summary h2 { font-size: clamp(1.7rem, 5vw, 2.35rem); line-height: 1.15; }
+.progress-card, .dinner-card { padding: 1rem; margin: .75rem 0; border-radius: 1rem; background: #fff; border: 1px solid #dce5f2; }
+.progress-card progress { display: block; width: 100%; height: .65rem; margin-top: .65rem; accent-color: #2563eb; }
+.dinner-card { display: flex; gap: .75rem; align-items: baseline; background: #e7efff; overflow-wrap: anywhere; }
+#days.timeline { grid-template-columns: 1fr; }
+.timeline article.today { border-color: #dce5f2; }
+.entry label:has(input:checked) { color: #52627e; text-decoration: line-through; }
+.entry input[type="checkbox"] { accent-color: #2563eb; }
+@media (max-width: 800px) {
+  :root { background: #eff3fb; color: #172847; }
+  main { width: auto; margin: 0 auto; padding: max(1rem, env(safe-area-inset-top)) 1rem calc(6.5rem + env(safe-area-inset-bottom)); }
+  header { padding: .5rem 0 1rem; color: inherit; background: transparent; }
+  header a { color: #2458af; font-weight: 650; }
+  header h1 { font-size: 1.65rem; margin-bottom: .2rem; }
+  header p { color: #52627e; }
+  .organizer-nav { position: fixed; z-index: 5; inset: auto 0 0; display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 0; align-items: center; padding: .45rem .2rem max(.5rem, env(safe-area-inset-bottom)); margin: 0; background: #fff; border-top: 1px solid #dce5f2; box-shadow: 0 -5px 22px #14295412; }
+  .organizer-nav button { flex-direction: column; justify-content: center; gap: .25rem; min-height: 48px; padding: .2rem 0; border: 0; border-radius: .65rem; background: transparent; color: #52627e; font-size: .68rem; font-weight: 650; white-space: nowrap; }
+  .organizer-nav [aria-current="page"] { background: #eaf1ff; color: #164cbe; }
+  .organizer-nav .mobile-add { display: flex; grid-area: 1 / 3; justify-self: center; width: 46px; height: 46px; min-height: 46px; border-radius: 50%; color: white; background: #2563eb; box-shadow: 0 4px 12px #2563eb55; font-size: 1.8rem; }
+  .desktop-task-label, #new-item { display: none; }
+  .mobile-task-label { display: inline; }
+  .toolbar { gap: .4rem; }
+  .toolbar button, .toolbar select, .entry button { min-height: 44px; }
+  #editor input, #editor select, #login input { min-height: 44px; font-size: 16px; }
+  .timeline article { padding: .55rem .85rem; }
+  .timeline .entry { padding: .8rem .55rem; }
+  .timeline .entry label { min-height: 38px; display: flex; align-items: center; gap: .5rem; font-weight: 650; }
+  .timeline .entry input { width: 20px; height: 20px; flex: 0 0 20px; }
+}
