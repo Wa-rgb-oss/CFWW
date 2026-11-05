@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Personal Calendar</title>
+  <title>Life Organizer</title>
   <link rel="stylesheet" href="/personal-calendar/calendar.css">
 </head>
 <body>
 <main>
-  <header><a href="/admin/">← Back to Admin Panel</a><h1>Personal Calendar</h1><p>Your shared household planner.</p></header>
+  <header><a href="/admin/">← Back to Admin Panel</a><h1>Life Organizer</h1><p>Your shared household planner.</p></header>
   <p id="status" role="status" aria-live="polite"></p>
   <form id="login" hidden>
     <label>Email <input name="email" type="email" autocomplete="username" required></label>
@@ -17,21 +17,35 @@
     <button>Sign in</button>
   </form>
   <section id="calendar" hidden>
+    <nav class="organizer-nav" aria-label="Organizer views">
+      <button type="button" data-mode="today">Today</button>
+      <button type="button" data-mode="week">Calendar</button>
+      <button type="button" data-mode="tasks">Tasks &amp; Routines</button>
+      <button type="button" data-mode="meals">Meal Plan</button>
+      <button type="button" data-mode="bills">Bills</button>
+    </nav>
+    <div class="organizer-workspace">
+    <section class="organizer-board" aria-labelledby="period">
     <div class="toolbar">
       <button id="previous" aria-label="Previous period">←</button>
       <button id="today">Today</button>
       <button id="next" aria-label="Next period">→</button>
-      <label>View <select id="view"><option value="week">Week</option><option value="month">Month</option><option value="bills">Monthly bills</option></select></label>
+      <label id="calendar-zoom">Calendar view <select id="view"><option value="week">Week</option><option value="month">Month</option></select></label>
+      <button id="new-item">+ New item</button>
       <button id="refresh">Refresh</button>
       <button id="logout">Sign out</button>
     </div>
     <h2 id="period"></h2>
     <div id="days"></div>
+    </section>
     <form id="editor">
       <h2 id="editor-title">Add an item</h2>
       <div class="fields">
         <label>Title <input name="title" maxlength="160" required></label>
-        <label>Date <input name="starts_on" type="date" required></label>
+        <label>Date <input name="starts_on" type="date"></label>
+        <label>Start time <input name="starts_at" type="time"></label>
+        <label>End time <input name="ends_at" type="time"></label>
+        <label>Assigned to <select name="assignee"><option value="">Anyone</option><option>Wade</option><option>Annabella</option><option>Both</option></select></label>
         <label>Category <select name="category"><option>Task</option><option>Dinner</option><option>Bill</option><option>Event</option><option>Holiday</option><option>Cleaning</option><option>Pet care</option><option>Self-care</option><option>Date night</option></select></label>
         <label>Repeats <select name="repeat"><option value="none">Never</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
         <label id="amount-label" hidden>Bill amount ($) <input name="amount" type="number" min="0" max="9999999999.99" step=".01"></label>
@@ -40,6 +54,7 @@
       <button id="save">Add item</button>
       <button id="cancel" type="button" hidden>Cancel edit</button>
     </form>
+    </div>
     <details id="sharing" hidden>
       <summary>Manage shared access</summary>
       <form id="share">

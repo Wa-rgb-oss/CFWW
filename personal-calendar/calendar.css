@@ -22,3 +22,24 @@ button:disabled { opacity: .6; cursor: wait; }
 .meta { display: block; color: #4f625d; font-size: .88rem; white-space: pre-wrap; }
 #login { max-width: 420px; }
 #login label { margin-bottom: .75rem; }
+
+main { width: min(1500px, 96%); }
+.organizer-nav { display: flex; gap: .45rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.organizer-nav [aria-current="page"] { background: #143d42; color: white; }
+.organizer-workspace { display: grid; grid-template-columns: minmax(0,1fr) minmax(260px, 300px); align-items: start; gap: 1rem; }
+.organizer-board { min-width: 0; }
+#editor { margin-top: 0; }
+#editor .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#editor .fields label:first-child { grid-column: 1 / -1; }
+#editor .fields :is(input,select) { width: 100%; }
+#days.calendar-grid { grid-template-columns: repeat(7,minmax(120px,1fr)); overflow-x: auto; gap: .35rem; }
+.calendar-grid article { padding: .6rem; min-height: 110px; }
+.calendar-grid h3 { font-size: .93rem; }
+.calendar-grid .calendar-heading { padding: .45rem; font-weight: 650; }
+.entry[data-category="Dinner"] { border-left: 3px solid #dc9848; padding-left: .4rem; }
+.entry[data-category="Bill"] { border-left: 3px solid #528c83; padding-left: .4rem; }
+.entry[data-category="Event"], .entry[data-category="Date night"], .entry[data-category="Holiday"] { border-left: 3px solid #8a72ae; padding-left: .4rem; }
+@media (max-width: 800px) {
+  .organizer-workspace { grid-template-columns: minmax(0,1fr); }
+  #editor { scroll-margin: 1rem; }
+}

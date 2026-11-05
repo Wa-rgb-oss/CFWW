@@ -9,6 +9,13 @@ const dayName = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "shor
 const monthName = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
 let cursor = new Date();
 let editing = null;
+let activeView = "today";
+const taskCategories = ["Task", "Cleaning", "Pet care", "Self-care"];
+const timeLabel = (value) => {
+  const [hours, minutes] = value.split(":").map(Number);
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${hours < 12 ? "AM" : "PM"}`;
+};
+const mode = () => activeView === "week" ? $("view").value : activeView;
 
 function dateKey(date) {
   return [date.getFullYear(), date.getMonth() + 1, date.getDate()]
@@ -57,10 +64,15 @@ async function run(action, control) {
 function edit(item) {
   editing = item?.id ?? null;
   editor.reset();
-  field("starts_on").value = dateKey(cursor);
+  field("starts_on").value = activeView === "tasks" ? "" : dateKey(cursor);
+  if (activeView === "meals") field("category").value = "Dinner";
+  if (activeView === "bills") {
+    field("category").value = "Bill";
+    field("repeat").value = "monthly";
+  }
   if (item) {
-    for (const name of ["title", "starts_on", "category", "repeat", "amount", "notes"]) {
-      field(name).value = item[name] ?? "";
+    for (const name of ["title", "starts_on", "category", "repeat", "amount", "notes", "starts_at", "ends_at", "assignee"]) {
+      field(name).value = ["starts_at", "ends_at"].includes(name) ? (item[name] ?? "").slice(0, 5) : item[name] ?? "";
     }
     editor.scrollIntoView({ block: "nearest" });
     field("title").focus({ preventScroll: true });
@@ -74,21 +86,27 @@ function edit(item) {
 function renderEntry(parent, item, key, done) {
   const entry = element("div", "", parent);
   entry.className = "entry";
+  entry.dataset.category = item.category;
   const label = element("label", "", entry);
   const checkbox = element("input", "", label);
   checkbox.type = "checkbox";
   checkbox.checked = done;
   label.append(" " + item.title);
-  const details = [item.category, item.amount === null ? "" : money.format(item.amount), item.notes].filter(Boolean);
+  const time = item.starts_at ? [item.starts_at, item.ends_at].filter(Boolean).map(timeLabel).join(" – ") : "";
+  const details = [time, item.category, item.assignee, item.repeat === "none" ? "" : item.repeat, item.amount === null ? "" : money.format(item.amount), item.notes].filter(Boolean);
   element("span", details.join(" · "), entry).className = "meta";
   checkbox.onchange = () => run(async () => {
     const table = supabase.from("personal_calendar_done");
     const record = { item_id: item.id, occurs_on: key };
     try {
-      checked(await (checkbox.checked
+      if (!key) {
+        checked(await supabase.from("personal_calendar_items").update({ undated_done: checkbox.checked }).eq("id", item.id).select("id").single());
+      } else {
+        checked(await (checkbox.checked
         ? table.upsert(record, { ignoreDuplicates: true })
         : table.delete().match(record)));
-      if ($("view").value === "bills") await load();
+      }
+      if (mode() === "bills") await load();
     } catch (error) {
       checkbox.checked = !checkbox.checked;
       throw error;
@@ -110,56 +128,122 @@ function renderEntry(parent, item, key, done) {
 let loadVersion = 0;
 async function load() {
   const version = ++loadVersion;
-  const mode = $("view").value;
-  const weekly = mode === "week";
-  const first = weekly ? addDays(cursor, -((cursor.getDay() + 6) % 7))
+  const current = mode();
+  const tasks = current === "tasks";
+  const today = current === "today";
+  const weekly = current === "week" || current === "meals";
+  const bills = current === "bills";
+  const monthGrid = current === "month";
+  const first = today ? cursor : weekly ? addDays(cursor, -((cursor.getDay() + 6) % 7))
     : new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-  const last = weekly ? addDays(first, 6) : new Date(first.getFullYear(), first.getMonth() + 1, 0);
-  let itemsQuery = supabase.from("personal_calendar_items").select().lte("starts_on", dateKey(last))
-    .or("repeat.neq.none,starts_on.gte." + dateKey(first)).order("title");
-  if (mode === "bills") itemsQuery = itemsQuery.eq("category", "Bill");
+  const last = today ? first : weekly ? addDays(first, 6)
+    : new Date(first.getFullYear(), first.getMonth() + 1, 0);
+  let itemsQuery = supabase.from("personal_calendar_items").select().order("starts_at", { nullsFirst: true }).order("title");
+  if (tasks) itemsQuery = itemsQuery.in("category", taskCategories);
+  else itemsQuery = itemsQuery.lte("starts_on", dateKey(last))
+    .or("repeat.neq.none,starts_on.gte." + dateKey(first));
+  if (bills) itemsQuery = itemsQuery.eq("category", "Bill");
+  if (current === "meals") itemsQuery = itemsQuery.eq("category", "Dinner");
   const [itemsResult, doneResult] = await Promise.all([
     itemsQuery,
-    supabase.from("personal_calendar_done").select().gte("occurs_on", dateKey(first)).lte("occurs_on", dateKey(last)),
+    tasks ? supabase.from("personal_calendar_done").select() :
+      supabase.from("personal_calendar_done").select().gte("occurs_on", dateKey(first)).lte("occurs_on", dateKey(last)),
   ]);
   if (version !== loadVersion) return;
   const items = checked(itemsResult);
   const done = new Set(checked(doneResult).map((row) => row.item_id + row.occurs_on));
   const grid = $("days");
   grid.replaceChildren();
-  $("period").textContent = weekly ? dayName.format(first) + " – " + dayName.format(last) : monthName.format(first);
+  grid.classList.toggle("calendar-grid", monthGrid || current === "week");
+  $("calendar-zoom").hidden = activeView !== "week";
+  $("previous").hidden = $("next").hidden = $("today").hidden = tasks;
+  for (const button of document.querySelectorAll("[data-mode]")) {
+    if (button.dataset.mode === activeView) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  }
+  if (tasks) {
+    $("period").textContent = "Tasks & Routines";
+    for (const [title, entries] of [
+      ["To-do inbox", items.filter((item) => !item.starts_on)],
+      ["Scheduled tasks", items.filter((item) => item.starts_on && item.repeat === "none")],
+      ["Repeating routines", items.filter((item) => item.repeat !== "none")],
+    ]) {
+      const card = element("article", "", grid);
+      element("h3", title, card);
+      if (!entries.length) element("p", "Nothing here yet.", card).className = "meta";
+      for (const item of entries) {
+        if (item.repeat === "none") {
+          const key = item.starts_on;
+          if (key) element("span", key, card).className = "meta";
+          renderEntry(card, item, key, key ? done.has(item.id + key) : item.undated_done);
+        } else {
+          const row = element("div", "", card);
+          row.className = "entry";
+          element("strong", item.title, row);
+          element("span", [item.starts_on, item.repeat, item.assignee].filter(Boolean).join(" · "), row).className = "meta";
+          element("button", "Edit", row).onclick = () => edit(item);
+          element("button", "View schedule", row).onclick = () => {
+            const [year, month, day] = item.starts_on.split("-").map(Number);
+            const start = new Date(year, month - 1, day);
+            cursor = item.repeat !== "none" && start < new Date() ? new Date() : start;
+            $("view").value = item.repeat === "weekly" ? "week" : "month";
+            switchView("week");
+          };
+        }
+      }
+    }
+    return;
+  }
+  $("period").textContent = today ? dayName.format(first) : weekly
+    ? dayName.format(first) + " – " + dayName.format(last) : monthName.format(first);
+  if (monthGrid) {
+    for (const name of ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]) {
+      element("div", name, grid).className = "calendar-heading";
+    }
+    for (let offset = 0; offset < (first.getDay() + 6) % 7; offset++) element("div", "", grid);
+  }
   let billTotal = 0;
   let billPaid = 0;
   for (let date = first; date <= last; date = addDays(date, 1)) {
     const key = dateKey(date);
     const entries = items.filter((item) => occurs(item, date, key));
-    if (mode === "bills" && !entries.length) continue;
+    if (bills && !entries.length) continue;
     const card = element("article", "", grid);
     if (key === dateKey(new Date())) card.className = "today";
-    element("h3", dayName.format(date), card);
-    if (!entries.length) element("p", "Nothing scheduled", card).className = "meta";
+    element("h3", monthGrid ? String(date.getDate()) : dayName.format(date), card);
+    if (!entries.length && !monthGrid) element("p", current === "meals" ? "Dinner not planned" : "Nothing scheduled", card).className = "meta";
     for (const item of entries) {
       const complete = done.has(item.id + key);
       renderEntry(card, item, key, complete);
-      if (mode === "bills") {
+      if (bills) {
         billTotal += Number(item.amount ?? 0);
         if (complete) billPaid += Number(item.amount ?? 0);
       }
     }
-    if (mode !== "bills") {
-      const add = element("button", "+ Add", card);
-      add.onclick = () => {
-        edit(null);
-        field("starts_on").value = key;
-        editor.scrollIntoView({ block: "nearest" });
-        field("title").focus({ preventScroll: true });
-      };
+    if (!bills) {
+      const add = element("button", current === "meals" ? "+ Dinner" : "+ Add", card);
+      add.setAttribute("aria-label", "Add item for " + dayName.format(date));
+      add.onclick = () => newItem(key);
     }
   }
-  if (mode === "bills") {
+  if (bills) {
     $("period").textContent += " · " + money.format(billPaid) + " paid of " + money.format(billTotal);
     if (!grid.childElementCount) element("p", "No bills scheduled this month.", grid);
   }
+}
+
+function newItem(key) {
+  edit(null);
+  if (key) field("starts_on").value = key;
+  editor.scrollIntoView({ block: "nearest" });
+  field("title").focus({ preventScroll: true });
+}
+
+function switchView(view) {
+  activeView = view;
+  if (view === "today") cursor = new Date();
+  if (!editing) edit(null);
+  run(load);
 }
 
 async function open(session) {
@@ -225,11 +309,25 @@ editor.onsubmit = (event) => {
     const item = Object.fromEntries(new FormData(editor));
     item.title = item.title.trim();
     item.amount = item.category === "Bill" && item.amount !== "" ? Number(item.amount) : null;
+    for (const name of ["starts_on", "starts_at", "ends_at", "assignee"]) item[name] ||= null;
+    if (!item.starts_on && (!taskCategories.includes(item.category) || item.repeat !== "none" || item.starts_at)) {
+      throw new Error("Add a date for events, meals, bills, timed items, and recurring routines.");
+    }
+    if (item.ends_at && (!item.starts_at || item.ends_at <= item.starts_at)) {
+      throw new Error("End time must be later than start time on the same day.");
+    }
+    if (item.starts_on) item.undated_done = false;
     const table = supabase.from("personal_calendar_items");
-    checked(await (editing ? table.update(item).eq("id", editing) : table.insert(item)));
-    const [year, month, day] = item.starts_on.split("-").map(Number);
-    cursor = new Date(year, month - 1, day);
-    if ($("view").value === "bills" && item.category !== "Bill") $("view").value = "week";
+    checked(await (editing ? table.update(item).eq("id", editing).select("id").single() : table.insert(item)));
+    if (item.starts_on) {
+      const [year, month, day] = item.starts_on.split("-").map(Number);
+      cursor = new Date(year, month - 1, day);
+      if (activeView === "today" && item.starts_on !== dateKey(new Date())) activeView = "week";
+      if (activeView === "bills" && item.category !== "Bill") activeView = "week";
+      if (activeView === "meals" && item.category !== "Dinner") activeView = "week";
+    } else {
+      activeView = "tasks";
+    }
     edit(null);
     await load();
   }, event.submitter);
@@ -237,12 +335,16 @@ editor.onsubmit = (event) => {
 
 field("category").onchange = () => { $("amount-label").hidden = field("category").value !== "Bill"; };
 $("cancel").onclick = () => edit(null);
+$("new-item").onclick = () => newItem();
+for (const button of document.querySelectorAll("[data-mode]")) {
+  button.onclick = () => switchView(button.dataset.mode);
+}
 $("view").onchange = () => run(load);
 $("refresh").onclick = () => run(load, $("refresh"));
 $("today").onclick = () => { cursor = new Date(); run(load); };
 for (const [id, step] of [["previous", -1], ["next", 1]]) {
   $(id).onclick = () => {
-    cursor = $("view").value === "week" ? addDays(cursor, step * 7)
+    cursor = ["week", "meals", "today"].includes(mode()) ? addDays(cursor, step * (mode() === "today" ? 1 : 7))
       : new Date(cursor.getFullYear(), cursor.getMonth() + step, 1);
     run(load);
   };
