@@ -1262,3 +1262,18 @@ body.admin-body {
 .cost-record button { padding:7px 10px; background:#fff; border:1px solid #cbd5d9; border-radius:9px; font-size:11px; }
 @media(max-width:900px){.cost-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.cost-form-grid { grid-template-columns:1fr; }.job-costs-panel .admin-panel-heading { align-items:stretch; flex-direction:column; }}
 @media(max-width:480px){.cost-summary-grid { grid-template-columns:1fr 1fr; }.cost-summary-grid strong { font-size:20px; }.cost-form-grid .admin-form-grid { grid-template-columns:1fr; }}
+
+.admin-nav .personal-calendar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .7rem .85rem;
+  border: 1px solid #75cece;
+  border-radius: .65rem;
+  color: #bdf7ed;
+  background: #193c47;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.admin-nav .personal-calendar-link:hover { background: #245260; }

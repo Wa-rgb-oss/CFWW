@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Personal Calendar</title>
+  <link rel="stylesheet" href="/personal-calendar/calendar.css">
+</head>
+<body>
+<main>
+  <header><a href="/admin/">← Back to Admin Panel</a><h1>Personal Calendar</h1><p>Your shared household planner.</p></header>
+  <p id="status" role="status" aria-live="polite"></p>
+  <form id="login" hidden>
+    <label>Email <input name="email" type="email" autocomplete="username" required></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password" required></label>
+    <button>Sign in</button>
+  </form>
+  <section id="calendar" hidden>
+    <div class="toolbar">
+      <button id="previous" aria-label="Previous period">←</button>
+      <button id="today">Today</button>
+      <button id="next" aria-label="Next period">→</button>
+      <label>View <select id="view"><option value="week">Week</option><option value="month">Month</option><option value="bills">Monthly bills</option></select></label>
+      <button id="refresh">Refresh</button>
+      <button id="logout">Sign out</button>
+    </div>
+    <h2 id="period"></h2>
+    <div id="days"></div>
+    <form id="editor">
+      <h2 id="editor-title">Add an item</h2>
+      <div class="fields">
+        <label>Title <input name="title" maxlength="160" required></label>
+        <label>Date <input name="starts_on" type="date" required></label>
+        <label>Category <select name="category"><option>Task</option><option>Dinner</option><option>Bill</option><option>Event</option><option>Holiday</option><option>Cleaning</option><option>Pet care</option><option>Self-care</option><option>Date night</option></select></label>
+        <label>Repeats <select name="repeat"><option value="none">Never</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
+        <label id="amount-label" hidden>Bill amount ($) <input name="amount" type="number" min="0" max="9999999999.99" step=".01"></label>
+      </div>
+      <label>Notes <textarea name="notes" maxlength="2000"></textarea></label>
+      <button id="save">Add item</button>
+      <button id="cancel" type="button" hidden>Cancel edit</button>
+    </form>
+    <details id="sharing" hidden>
+      <summary>Manage shared access</summary>
+      <form id="share">
+        <label>Partner’s Supabase Auth user ID <input name="partner" placeholder="User UUID"></label>
+        <p>Copy her user ID from Authentication → Users. Clear the field to remove access.</p>
+        <button>Save access</button>
+      </form>
+    </details>
+  </section>
+</main>
+<script type="module" src="/personal-calendar/calendar.js"></script>
+</body>
+</html>
